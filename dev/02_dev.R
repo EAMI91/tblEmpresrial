@@ -43,7 +43,7 @@ usethis::use_test( "app" )
 # Documentation
 
 ## Vignette ----
-usethis::use_vignette("tblEmpresrial")
+usethis::use_vignette("noticias")
 devtools::build_vignettes()
 
 ## Code coverage ----
