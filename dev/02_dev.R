@@ -20,6 +20,12 @@ usethis::use_package("shinydashboard")
 usethis::use_package("highcharter")
 usethis::use_package("ggplot2")
 usethis::use_package("tibble")
+usethis::use_package("quanteda")
+usethis::use_package("plotly")
+usethis::use_package("tidyr")
+usethis::use_package("ggfittext")
+usethis::use_package("ggthemes")
+
 ## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
