@@ -12,10 +12,14 @@ Imports:
     attempt,
     DT,
     glue,
-    htmltools
+    htmltools,
+    dplyr,
+    shinydashboard,
+    highcharter,
+    tibble
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
