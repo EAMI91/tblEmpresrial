@@ -1,8 +1,10 @@
 ---
-title: "GrafiacasNoticias"
-author: "Jaz"
-date: "2/18/2021"
-output: html_document
+title: "noticias"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{noticias}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -19,7 +21,8 @@ comment = "#>"
 ```
 
 ```{r setup}
-library(tidyverse)
+library(dplyr)
+library(tidyr)
 library(highcharter)
 library(quanteda)
 library(ggthemes)
@@ -541,3 +544,4 @@ calificada_no_generada <- function(bd, cand){
 ```{r}
 calificada_no_generada(BD,  cand = "candidato 2")
 ```
+
