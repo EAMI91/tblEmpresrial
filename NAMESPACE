@@ -2,6 +2,7 @@
 
 export(run_app)
 import(dplyr)
+import(ggchicklet)
 import(ggplot2)
 import(highcharter)
 import(shiny)
