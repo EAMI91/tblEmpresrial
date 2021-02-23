@@ -15,12 +15,17 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
-
+usethis::use_package("dplyr")
+usethis::use_package("shinydashboard")
+usethis::use_package("highcharter")
+usethis::use_package("ggplot2")
+usethis::use_package("tibble")
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module( name = "name_of_module1" ) # Name of the module
-golem::add_module( name = "name_of_module2" ) # Name of the module
-
+golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
+golem::add_module( name = "redes_sociales", fct = "graficas" ) # Name of the module
+golem::add_module( name = "noticias", fct = "graficas" )
+golem::add_module( name = "a_electoral", fct = "graficas" )
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 
