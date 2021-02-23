@@ -1,3 +1,34 @@
+---
+title: "encuestas"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{encuestas}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+#Hacer 3 funciones de graficas 3 fake datas y en mod_fctgrafs las pongo
+
+```
+
+```{r setup}
+library(highcharter)
+library(tidyverse)
+library(magrittr)
+library(readr)
+library(ggchicklet)
+```
+
+```{r include = T}
+bd <- read_csv("bd_pollofpolls.csv")
+puntos <- read_csv("puntos_pollofpolls.csv")
+
 hPollofPolls <- function(DB, puntos, hoy, eleccion) {
   # Funciones para volver al español
   hcoptslang <- getOption("highcharter.lang")
@@ -12,7 +43,7 @@ hPollofPolls <- function(DB, puntos, hoy, eleccion) {
   Graph <- highchart() %>%
     hc_chart(style = list(fontColor = "#1C313D", fontFamily= "Avenir Next"), zoomType = "x"
              # events = list(load = JS(vSeries(grupos = candidatos)))
-    ) %>%
+             ) %>%
     hc_add_series(data = hoy,showInLegend = F,hcaes(x= x, y = y), type = "column", color ="#8BA4B0") %>% 
     hc_add_series(data = eleccion,showInLegend = F, hcaes(x= x, y = y), type = "column", color ="#BF374E") %>% 
     hc_add_series(DB, "arearange", 
@@ -55,24 +86,38 @@ hPollofPolls <- function(DB, puntos, hoy, eleccion) {
   
   return(Graph)
 }
+    hoy<- tibble(x= max(as.Date(puntos$fechaEncuesta)), y= 50) %>% mutate(tt = "Última<br> encuesta")
+    eleccion<- tibble(x= as.Date("2021-06-06"), y= 50) %>% mutate(tt = "Día de la<br> elección")
+bd %>% hPollofPolls(puntos = puntos, hoy = hoy, eleccion = eleccion)
+```
 
+
+```{r include = T}
 
 intVotoBarras <- function(bd){
   bd %>% 
-    ggplot(aes(x = partido, y  = n, fill = partido))+
-    geom_chicklet(radius = grid::unit(10, "pt"), width = .2)+
-    labs(title = "Intención de voto", y = "", x = "")+
-    coord_flip()+theme_minimal()+
-    theme(panel.grid= element_blank(),
-          legend.position = "none",
-          plot.title = element_text(size = 22,
-                                    colour =  "#13384D",
-                                    hjust = 0, face="bold"),
-          text = element_text(family = "Avenir Next"))+
-    scale_fill_manual(values = c("red", "blue", "pink"))
+  ggplot(aes(x = partido, y  = n, fill = partido))+
+  geom_chicklet(radius = grid::unit(10, "pt"), width = .2)+
+  labs(title = "Intención de voto", y = "", x = "")+
+  coord_flip()+theme_minimal()+
+  theme(panel.grid= element_blank(),
+        legend.position = "none",
+              plot.title = element_text(size = 22,
+                                colour =  "#13384D",
+                                hjust = 0, face="bold"),
+        text = element_text(family = "Avenir Next"))+
+  scale_fill_manual(values = c("red", "blue", "pink"))
 }
+  
+tibble(partido = c("MORENA", "PAN", "PRI"),
+       n = c(43, 28, 27)) %>% 
+  intVotoBarras()
+
+```
 
 
+
+```{r include = T}
 probGanarOld <- function(bd, candidato, nCand){
   
   pCand <- bd %>% 
@@ -123,3 +168,14 @@ probGanarOld <- function(bd, candidato, nCand){
     )
   return(g)
 }
+tibble( y = c("1", "2", "3"),
+        candidato = c("MORENA", "PAN", "PRI"),
+        dia = rep(77, 3),
+        color = c("#751438", "#17418A", "#EB0E0E"),
+        p = c(.43, .28, .27),
+        fecha = rep(as.Date("2021-06-06"), 3),
+        prob = c(43, 28, 27),
+        label = c("43%", "28%", "27%"),
+         rw = c(1, 2, 3)) %>% 
+  probGanarOld(candidato = "MORENA", 5)
+```
