@@ -20,6 +20,7 @@ usethis::use_package("shinydashboard")
 usethis::use_package("highcharter")
 usethis::use_package("ggplot2")
 usethis::use_package("tibble")
+<<<<<<< HEAD
 usethis::use_package("slickR")
 usethis::use_package("quanteda")
 usethis::use_package("plotly")
@@ -27,6 +28,10 @@ usethis::use_package("tidyr")
 usethis::use_package("ggfittext")
 usethis::use_package("ggthemes")
 usethis::use_package("ggchicklet")
+=======
+usethis::use_package("magrittr")
+usethis::use_package("lubridate")
+>>>>>>> redes_sociales
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -58,9 +63,13 @@ usethis::use_test( "app" )
 # Documentation
 
 ## Vignette ----
+<<<<<<< HEAD
 usethis::use_vignette("noticias")
 usethis::use_vignette("tblEmpresrial")
 usethis::use_vignette("encuestas")
+=======
+usethis::use_vignette("redes_sociales")
+>>>>>>> redes_sociales
 devtools::build_vignettes()
 
 ## Code coverage ----

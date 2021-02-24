@@ -16,7 +16,7 @@ app_ui <- function(request) {
           menuItem("Encuestas", tabName = "encuestas",
                    icon = icon("th")),
           menuItem("Redes sociales", tabName = "red_social",
-                   icon = icon("th")),
+                   icon = icon("twitter-square")),
           menuItem("Noticias", tabName = "noticias",
                    icon = icon("newspaper")),
           menuItem("Análisis electoral", tabName = "a_electoral",
