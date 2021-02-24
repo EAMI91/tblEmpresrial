@@ -758,8 +758,6 @@
       "Repository": "CRAN",
       "Hash": "97def703420c8ab10d8f0e6c72101e02"
     },
-<<<<<<< HEAD
-=======
     "quanteda": {
       "Package": "quanteda",
       "Version": "2.1.2",
@@ -767,7 +765,6 @@
       "Repository": "CRAN",
       "Hash": "6f03082d55eb9d912eb59474c075eebd"
     },
->>>>>>> noticias
     "quantmod": {
       "Package": "quantmod",
       "Version": "0.4.18",
@@ -845,8 +842,6 @@
       "Repository": "CRAN",
       "Hash": "599df23c40a4fce9c7b4764f28c37857"
     },
-<<<<<<< HEAD
-=======
     "rle": {
       "Package": "rle",
       "Version": "0.9.2",
@@ -854,7 +849,6 @@
       "Repository": "CRAN",
       "Hash": "f84d8f430c496bb5c6769fed95705562"
     },
->>>>>>> noticias
     "rlist": {
       "Package": "rlist",
       "Version": "0.4.6.1",
