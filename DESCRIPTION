@@ -25,3 +25,5 @@ Suggests:
 Config/testthat/edition: 3
 URL: https://github.com/EAMI91/tblEmpresrial
 BugReports: https://github.com/EAMI91/tblEmpresrial/issues
+Depends: 
+    R (>= 2.10)

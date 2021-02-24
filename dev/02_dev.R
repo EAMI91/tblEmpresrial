@@ -20,6 +20,7 @@ usethis::use_package("shinydashboard")
 usethis::use_package("highcharter")
 usethis::use_package("ggplot2")
 usethis::use_package("tibble")
+usethis::use_package("slickR")
 ## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
@@ -39,7 +40,7 @@ golem::add_css_file( "custom" )
 
 ## Add internal datasets ----
 ## If you have data in your package
-usethis::use_data_raw( name = "my_dataset", open = FALSE ) 
+usethis::use_data_raw( name = "imgs") 
 
 ## Tests ----
 ## Add one line by test you want to create

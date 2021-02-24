@@ -7,10 +7,13 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
+#' @import slickR
 mod_a_electoral_ui <- function(id){
   ns <- NS(id)
   tagList(
- 
+    fluidRow(
+      slickROutput(ns("pdf"),width='80%',height = 100) 
+    )
   )
 }
     
@@ -20,6 +23,11 @@ mod_a_electoral_ui <- function(id){
 mod_a_electoral_server <- function(input, output, session){
   ns <- session$ns
  
+  output$pdf <- renderSlickR({
+    slickR(
+      imgs,height = 800
+    )
+  }) 
 }
     
 ## To be copied in the UI
