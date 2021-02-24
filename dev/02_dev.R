@@ -29,6 +29,7 @@ usethis::use_package("ggthemes")
 usethis::use_package("ggchicklet")
 usethis::use_package("magrittr")
 usethis::use_package("lubridate")
+usethis::use_package("shinycssloaders")
 
 
 ## Add modules ----
