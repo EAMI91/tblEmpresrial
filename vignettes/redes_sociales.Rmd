@@ -1,7 +1,41 @@
+---
+title: "redes_sociales"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{redes_sociales}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+
+
 library(magrittr)
 library(dplyr)
 library(lubridate)
 library(highcharter)
+
+
+```
+
+
+```{r}
+proyectos <- tibble( grupo = sample(c("Tweet", "Menciones", "RT", "Likes"),
+                                    prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
+                     fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T )) %>%
+  arrange(fecha) %>% 
+  group_by(fecha, grupo) %>%
+  summarise(n=n()) 
+```
+
+```{r}
 
 
 reach <- function(bd){
@@ -13,10 +47,12 @@ reach <- function(bd){
              lineWidth = 0, tickWidth  = 0, gridLineWidth =0,
              showLastLabel= F,
              labels = list(step = 3, style = list(fontSize = "16px", color = "#FFF") )) %>%
-    hc_yAxis(crosshair = F, title = list(text = "Total", style = list(color = "#FFF")), tickAmount = 3, max = 10, min =0,
+    hc_yAxis(crosshair = F, title = list(text = "Total de proyectos", style = list(color = "#FFF")), tickAmount = 3, max = 10, min =0,
              dashStyle = "dot",
              gridLineWidth =.5, showFirstLabel = F, gridLineColor = "",
              labels = list( style = list(fontSize = "12px") )) %>%
+    #title
+    hc_title(text = "<b>Proyectos de ley</b>",  style = list(color = "#FFF")) %>%
     #tooltip
     hc_tooltip(
       borderWidth= 0,
@@ -28,20 +64,32 @@ reach <- function(bd){
       headerFormat= '<span style="font-size: 10px">{point.key}</span><br/>'
       # pointFormat = '<span style="color:{point.color}">●</span> <b> {point.candidato}<b><br> p. clave: {point.palabra}<br> {point.n} tuits <br> {point.rt} retuits<br> {point.favs} favoritos<br>'
     ) %>%
-    hc_colors(colors = c("#2C6170", "#FF6B6B", "#FFE66D", "steelblue"))  %>% 
+ hc_add_theme(hc_theme_gridlight()) %>% 
+    hc_colors(colors = c("#2C6170", "#FF6B6B", "#FFE66D", "steelblue")) %>%
     hc_chart(style = list(fontFamily = "Avenir next"
-    ))%>%
-    hc_add_theme(hc_theme_google())%>%
-    #title
-    hc_title(text = "Alcance en redes sociales",  style = list(fontWeight = "bold", fontSize = "15px")) 
+    ))
   
 }
 
 
- reach(proyectos)
+reach(proyectos)
 
-graficando_saldo <- function(df){
-  hchart(df, hcaes(y = n2, group = voto, x = mes), type = "bar") %>%
+```
+
+```{r}
+
+
+bd <- tibble(votos = sample(30:78, size = 172, replace = T),
+             voto = sample(c("Negativo", "Positivo"), size = 172, replace = T, prob = c(.5, .5))) %>%
+  mutate(mes = cut(votos,c(17,29,39,49,59,69,79, 89,100),
+                   labels = c("Semana 1", "Semana 2", "Semana 3", "Semana 4", "Semana 5", "Semana 6", "Semana 7", "Semana 8"))) %>%
+  count(mes, voto) %>%
+  mutate(n = as.double(n),
+         n2= case_when(voto == "Negativo"~ n*-1,
+                       voto == "Positivo"~ n))
+
+graficando_saldo <- function(bd){
+  hchart(bd, hcaes(y = n2, group = voto, x = mes), type = "bar") %>%
     hc_colors(colors = c("#f03b20", "#31a354")) %>%
     hc_plotOptions(bar = list(stacking = T, borderRadius = 5,
                               dataLabels= list(enabled =F,
@@ -58,14 +106,10 @@ graficando_saldo <- function(df){
                               )
     ))%>%
     
-    hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }"))) %>%
-    hc_add_theme(hc_theme_google())%>%
-    #title
-    hc_title(text = "Balance de comentarios",  style = list(fontWeight = "bold", fontSize = "15px")) 
+    hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }")))
   
 }
 
+graficando_saldo(bd)
 
-# graficando_saldo(df)
-
-
+```
