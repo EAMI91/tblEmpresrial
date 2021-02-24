@@ -102,10 +102,10 @@
     },
     "XML": {
       "Package": "XML",
-      "Version": "3.99-0.5",
+      "Version": "3.99-0.3",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "408d42d1359f2a84d377c1f7f0568624"
+      "Hash": "c1616606f097075542c12fb8a10a071e"
     },
     "askpass": {
       "Package": "askpass",
