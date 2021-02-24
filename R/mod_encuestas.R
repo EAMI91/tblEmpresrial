@@ -42,7 +42,7 @@ mod_encuestas_server <- function(input, output, session, bd){
   
   output$votacion <- renderPlot({
     tibble(partido = c("MORENA", "PAN", "PRI"),
-           n = c(43, 28, 27)) %>% 
+           n = c(.43, .28, .27)) %>% mutate(n2 = paste0(n*100, "%")) %>% 
       intVotoBarras()
   })
   
