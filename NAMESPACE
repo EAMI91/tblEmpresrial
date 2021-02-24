@@ -2,8 +2,8 @@
 
 export(run_app)
 import(dplyr)
-import(ggfittext)
 import(ggchicklet)
+import(ggfittext)
 import(ggplot2)
 import(ggthemes)
 import(highcharter)
