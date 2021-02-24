@@ -1,3 +1,35 @@
+---
+title: "encuestas"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{encuestas}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+#Hacer 3 funciones de graficas 3 fake datas y en mod_fctgrafs las pongo
+
+```
+
+```{r setup}
+library(highcharter)
+library(tidyverse)
+library(magrittr)
+library(readr)
+library(ggchicklet)
+```
+
+```{r include = T}
+bd <- read_csv("bd_pollofpolls.csv")
+puntos <- read_csv("puntos_pollofpolls.csv")
+
+
 vSeries<-function(grupos){
   num <-seq_len(grupos)+1
   letra<- letters[num]
@@ -40,7 +72,7 @@ hPollofPolls <- function(DB, puntos, hoy, eleccion) {
   Graph <- highchart() %>%
     hc_chart(style = list(fontColor = "#1C313D", fontFamily= "Avenir Next"), zoomType = "x",
              events = list(load = JS(vSeries(grupos = candidatos)))
-    ) %>%
+             ) %>%
     hc_add_series(data = hoy,showInLegend = F,hcaes(x= x, y = y), type = "column", color ="#8BA4B0") %>% 
     hc_add_series(data = eleccion,showInLegend = F, hcaes(x= x, y = y), type = "column", color ="#BF374E") %>% 
     hc_add_series(DB, "arearange", 
@@ -83,7 +115,13 @@ hPollofPolls <- function(DB, puntos, hoy, eleccion) {
   
   return(Graph)
 }
+    hoy<- tibble(x= max(as.Date(puntos$fechaEncuesta)), y= 50) %>% mutate(tt = "Última<br> encuesta")
+    eleccion<- tibble(x= as.Date("2021-06-06"), y= 50) %>% mutate(tt = "Día de la<br> elección")
+bd %>% hPollofPolls(puntos = puntos, hoy = hoy, eleccion = eleccion)
+```
 
+
+```{r include = T}
 
 intVotoBarras <- function(bd){
   bd %>% 
@@ -109,7 +147,16 @@ intVotoBarras <- function(bd){
                                  "PT" = "#D63131",
                                  "INDEPENDIENTE 2" ="#2F9C37"))
 }
+  
+tibble(partido = c("MORENA", "PAN", "PRI"),
+       n = c(.43, .28, .27)) %>% mutate(n2 = paste0(n*100, "%")) %>% 
+  intVotoBarras()
 
+```
+
+
+
+```{r include = T}
 probGanarOld <- function(bd, candidato, nCand){
   
   pCand <- bd %>% 
@@ -157,8 +204,19 @@ probGanarOld <- function(bd, candidato, nCand){
       panel.grid.major.y = element_blank(),
       legend.title = element_blank(),
       panel.grid = element_blank(),
-      axis.text.x = element_text(size = 40/.pt),
+            axis.text.x = element_text(size = 40/.pt),
       axis.title = element_blank()
     )
   return(g)
 }
+tibble( y = c("1", "2", "3"),
+        candidato = c("MORENA", "PAN", "PRI"),
+        dia = rep(77, 3),
+        color = c("#751438", "#17418A", "#EB0E0E"),
+        p = c(.43, .28, .27),
+        fecha = rep(as.Date("2021-06-06"), 3),
+        prob = c(43, 28, 27),
+        label = c("43%", "28%", "27%"),
+         rw = c(1, 2, 3)) %>% 
+  probGanarOld(candidato = "MORENA", 5)
+```
