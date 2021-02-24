@@ -38,7 +38,6 @@ reach <- function(bd){
 }
 
 
- reach(proyectos)
 
 graficando_saldo <- function(df){
   hchart(df, hcaes(y = n2, group = voto, x = mes), type = "bar") %>%
@@ -66,6 +65,5 @@ graficando_saldo <- function(df){
 }
 
 
-# graficando_saldo(df)
 
 
