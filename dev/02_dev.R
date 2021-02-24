@@ -30,6 +30,7 @@ usethis::use_package("ggchicklet")
 usethis::use_package("magrittr")
 usethis::use_package("lubridate")
 
+
 ## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
@@ -64,6 +65,7 @@ usethis::use_vignette("noticias")
 usethis::use_vignette("tblEmpresrial")
 usethis::use_vignette("encuestas")
 usethis::use_vignette("redes_sociales")
+
 devtools::build_vignettes()
 
 ## Code coverage ----
