@@ -296,15 +296,16 @@ bd <- bd %>%
   mutate(n  =  1) %>%
   group_by(tipoEvento, candidato) %>%
   summarise(across(n, sum)) %>% 
-  mutate(percentage = 100*n/sum(n)) %>% 
+  mutate(percentage =round(100*n/sum(n))) %>% 
   mutate(label = paste(round(percentage, 1), "%", sep = " "))
   
 Graph <- ggplot(bd, aes(x = tipoEvento, y = percentage,
           fill = as.factor(candidato), label = label)) +
   ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
-                            radius = grid::unit(5, "pt"), width = .8, alpha =.85)+
+                            radius = grid::unit(5, "pt"), width = .9, alpha =.85)+
           # geom_col(width = 0.9, position = position_dodge(0.95)) + 
-          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", size = 10) +
+          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", vjust = 1) +
+  # geom_text( hjust = 1.3, color = "#FFFFFF", size = 8, position = ggplot2::position_dodge())+
           theme_hc() + scale_fill_calc() + 
           labs(title = "Tipos de eventos", caption = "", x = "", y = "") +
           theme(
