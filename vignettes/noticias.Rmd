@@ -301,9 +301,10 @@ bd <- bd %>%
   
 Graph <- ggplot(bd, aes(x = tipoEvento, y = percentage,
           fill = as.factor(candidato), label = label)) +
-  ggchicklet::geom_chicklet(position = ggplot2::position_dodge())+
+  ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
+                            radius = grid::unit(5, "pt"), width = .8, alpha =.85)+
           # geom_col(width = 0.9, position = position_dodge(0.95)) + 
-          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top") +
+          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", size = 10) +
           theme_hc() + scale_fill_calc() + 
           labs(title = "Tipos de eventos", caption = "", x = "", y = "") +
           theme(
