@@ -225,7 +225,7 @@ temas_eleccion <- function(bd, pregunta, otro, x, titulo =""){
     Graph <- bd_1 %>%  gather(x, y) %>% mutate(y = round(y *100)) %>% 
       hchart(hcaes(x = x, y  =y), type = "line") %>%  
       hc_title(text =paste("<b>", titulo,"<b>") , align = "left", style = list(fontSize = "22px", color = "#13384D")) %>% 
-      hc_plotOptions(line = list(lineWidth = 4, marker = list(radius = 7))) %>% 
+      hc_plotOptions(line = list(lineWidth = 7, marker = list(radius = 7))) %>% 
       hc_yAxis(lineWidth =0, title = list(enabled = F),
                tickAmount = 4, showLastLabel = T,
                gridLineWidth  =1,
@@ -239,7 +239,7 @@ temas_eleccion <- function(bd, pregunta, otro, x, titulo =""){
         fontFamily = "Avenir Next",
         # color = "#0c5776",
         fontSize = "16px"))) %>% 
-      hc_colors("#81cbfe") %>% 
+      hc_colors("#4F5F80") %>% 
       hc_tooltip(headerFormat = "",
                  pointFormat= '<b>{point.y}%</b>',
                  borderWidth= 0, shape = "square", shadow=F) %>% 
@@ -304,7 +304,7 @@ Graph <- ggplot(bd, aes(x = tipoEvento, y = percentage,
   ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
                             radius = grid::unit(5, "pt"), width = .9, alpha =.85)+
           # geom_col(width = 0.9, position = position_dodge(0.95)) + 
-          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", vjust = 1) +
+          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", vjust = 1, color = "#FFFFFF") +
   # geom_text( hjust = 1.3, color = "#FFFFFF", size = 8, position = ggplot2::position_dodge())+
           theme_hc() + scale_fill_calc() + 
           labs(title = "Tipos de eventos", caption = "", x = "", y = "") +
@@ -396,8 +396,11 @@ mencion_generada <- function(bd, candidatos){
   
   Graph <- ggplot(bd, aes(x = mencionGenerada, y = percentage,
                           fill = as.factor(candidato), label = label)) +
-    geom_col(width = 0.9, position = position_dodge(0.95)) + 
-    geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top") +
+    ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
+                            radius = grid::unit(5, "pt"), width = .9, alpha =.85)+
+          # geom_col(width = 0.9, position = position_dodge(0.95)) + 
+          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", vjust = 1, color = "#FFFFFF")+
+    # geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top") +
     theme_hc() + scale_fill_calc() + 
     labs(title = "Menciones del candidato generadas", caption = "", x = "", y = "") +
     theme(
@@ -486,25 +489,34 @@ calificada_generada <- function(bd, cand){
     filter(candidato == cand) %>% 
     mutate(n = 1) %>% 
     group_by(mencionGenerada, calif_generada) %>% 
-    summarise(across(n, sum))
+    summarise(across(n, sum)) %>% 
+    mutate(mencionGenerada = stringr::str_to_sentence(mencionGenerada),
+           calif_generada = factor(calif_generada, c("Mala", "Regular", "Buena")))
   
   cand_1 <- as.character(cand)
   
-  Graph <- ggplot(bd, aes(x = n, y = mencionGenerada,
+  Graph <- ggplot(bd, aes(y = n, x = mencionGenerada,
            fill = as.factor(calif_generada), label = n)) +
-           geom_col(width = 0.9, position = position_dodge(0.95)) +
-           geom_bar_text(position = "dodge", grow = F, reflow = T, place = "right") +
-           theme_minimal() + scale_fill_manual(values = c("#33CA7F", "#FC9F5B", "#ECE4B7")) +
+    ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
+                            radius = grid::unit(4, "pt"), width = .9, alpha =.8)+
+          geom_bar_text(position = "dodge", grow = F, reflow = F, 
+                        # place = "top",
+                        color = "#FFFFFF")+
+           theme_minimal() + scale_fill_manual(values = c("Buena"= "#89A100",
+                                                          "Mala" = "#710627", 
+                                                          "Regular" = "#E08931")) +
            labs(title = paste("Calificación de menciones generadas de", cand_1, sep = " "),
            caption = "", x = "Frecuencia", y = "") +
            theme(
+             panel.grid.minor = element_blank(),
+             panel.grid.major.y = element_blank(),
               axis.title.y = element_blank(),
               axis.title.x = element_text(color = "#8b878d"),
               text = element_text(family = "Avenir Next", size = 12),
               plot.title = element_text(size = 14, colour =  "#13384D", hjust = 0, face = "bold"),
               axis.text.y = element_text(family = "Avenir Next", size = 12),
               legend.title = element_blank()
-            )
+            )+ coord_flip()
   
   return(Graph)
 }
