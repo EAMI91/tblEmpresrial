@@ -37,7 +37,7 @@ mod_encuestas_server <- function(input, output, session, bd){
     
     hoy<- tibble(x= max(as.Date(puntos$fechaEncuesta)), y= 50) %>% mutate(tt = "Última<br> encuesta")
     eleccion<- tibble(x= as.Date("2021-06-06"), y= 50) %>% mutate(tt = "Día de la<br> elección")
-    bd_pop %>% hPollofPolls(puntos = puntos_pop, hoy = hoy, eleccion = eleccion)
+    bd_pop %>% hPollofPolls(puntos = puntos, hoy = hoy, eleccion = eleccion)
   })
   
   output$votacion <- renderPlot({
