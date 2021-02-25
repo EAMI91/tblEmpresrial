@@ -29,6 +29,7 @@ library(ggthemes)
 library(ggfittext)
 library(plotly)
 library(RColorBrewer)
+library(ggchicklet)
 ```
 
 ```{r}

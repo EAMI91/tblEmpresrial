@@ -56,66 +56,37 @@ mod_noticias_server <- function(input, output, session){
   bd <- reactive({
     n <- 1000
     v <- rep("Este es un texto a ser noticia", n)
-    A <- tibble(id = 1:n, title = v) 
-    X <- sample(c("Buena", "Mala", "Regular"), n, replace=T) 
-    B <- tibble(id = 1:n, calificacion = X)
-    C <- A %>% left_join(B) 
-    
     x <- c("12/01/2020", "13/01/2020","14/01/2020", "15/01/2020", "16/01/2020", "17/01/2020",
            "12/02/2020", "13/02/2020","14/02/2020", "15/02/2020", "16/02/2020", "17/02/2020",
            "12/01/2021", "13/01/2021","14/01/2021", "15/01/2021", "16/01/2021", "17/01/2021",
            "12/02/2021", "13/02/2021","14/02/2021", "15/02/2021", "16/02/2021", "17/02/2021")
-    
-    fechas <- tibble(id = 1:n, fecha = as.Date(rep(x, len = n)))                 
-    D <- C %>% left_join(fechas) %>% mutate(Noticias = 1)
-    
+    X <- sample(c("Buena", "Mala", "Regular"), n, replace=T) 
     filePath <- "http://www.sthda.com/sthda/RDoc/example-files/martin-luther-king-i-have-a-dream-speech.txt"
     text <- readLines(filePath) 
     remove <- c("", " ")
     text <- setdiff(text, remove)
-    desc <- tibble(id = 1:n, text = rep(text, len = n))               
-    G <- left_join(D, desc)
-    a <- tibble( id = 1:n,
-                 temas = sample(c("Deportes", "Cultura", "Sociedad", "Tecnología", "Otros"), n, replace=T))
-    a <- mutate(a, temasOtro = case_when(temas == "Otros" ~ "Otro tema"))
     
-    H <- G %>% left_join(a)
-    H
+    BD <- tibble(
+    id = 1:n, title = v, calificacion = X,
+    fecha = as.Date(rep(x, len = n)),
+    text = rep(text, len = n),               
+    temas = sample(c("Deportes", "Cultura", "Sociedad", "Tecnología", "Otros"), n, replace=T)) %>% 
+    mutate(temasOtro = case_when(temas == "Otros" ~ "Otro tema"), Noticias = 1)
+    BD
   })
   
   bd_2 <- reactive({
     n <- 1000
-    Eventos <- tibble(
+    BD <- tibble(
     id = 1:n,
     tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
-    candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T)
-    )
-    percep <- tibble(
-    id = 1:n, 
+    candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T),
     percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
-    )
-    BD <- left_join(Eventos, percep)
-    mencion <- tibble(
-    id = 1:n, 
     mencionGenerada = sample(c("Boletines\n de prensa", "declaraciones", "filtraciones"), n, replace = T),
-    )
-    BD <- left_join(BD, mencion)
-    mencionNo <- tibble(
-    id = 1:n, 
     mencionNoGenerada = sample(c("personaje", "columnista", "adversario", "partidario"), n, replace = T),
-    )
-    BD <- left_join(BD, mencionNo)
-    calificacion_generada <- tibble(
-    id = 1:n, 
     calif_generada = sample(c("Mala", "Buena", "Regular"), n, replace = T),
+    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T)
     )
-    BD <- left_join(BD, calificacion_generada)
-    calificacion_no_generada <- tibble(
-    id = 1:n, 
-    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T),
-    )
-    BD <- left_join(BD, calificacion_no_generada)
-    BD
     })
   
   output$timeNoticias <- renderHighchart({
@@ -144,33 +115,35 @@ mod_noticias_server <- function(input, output, session){
   })
   
   output$tipoEventos <- renderPlot({
-  
-    tipos_eventos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"))
-  })
+    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
+                      tipoEvento, "Tipos de enventos")
+    })
   
   output$percepcionMedios <- renderPlot({
-  
-    percepcion_medios(bd_2(),  c("candidato 1", "candidato 2", "candidato 3"))
-  })
+    
+    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
+                      percepcion, "Percepción en Medios")
+    })
   
   output$mencionGenerada <- renderPlot({
-  
-    mencion_generada(bd_2(),  c("candidato 1", "candidato 2", "candidato 3"))
+    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
+                      mencionGenerada, "Menciones del candidato generadas")
   })
   
   output$mencionNoGenerada <- renderPlot({
-    
-    mencion_no_generada(bd_2(),  c("candidato 1", "candidato 2", "candidato 3"))
-  })
+    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
+                      mencionNoGenerada, "Menciones del candidato no generadas")
+      })
   
   output$califGenerada <- renderPlot({
-  
-    calificada_generada(bd_2(), cand = "candidato 1")
+    barras_calificada(bd_2(), cand = "candidato 1", mencionGenerada,
+                      calif_generada, "Calificación de menciones generadas de")
   })
   
   output$califNoGenerada <- renderPlot({
     
-    calificada_no_generada(bd_2(),  cand = "candidato 2")
+    barras_calificada(bd_2(), cand = "candidato 2", mencionNoGenerada,
+                      calif_no_generada, "Calificación de menciones generadas de")
   })
 }
  
