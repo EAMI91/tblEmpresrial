@@ -30,7 +30,7 @@ mod_encuestas_ui <- function(id){
 #' encuestas Server Function
 #'
 #' @noRd 
-mod_encuestas_server <- function(input, output, session, bd){
+mod_encuestas_server <- function(input, output, session){
   ns <- session$ns
   
   output$iVoto <- renderHighchart({

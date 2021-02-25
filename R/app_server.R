@@ -7,12 +7,8 @@
 app_server <- function( input, output, session ) {
   # List the first level callModules here
   
-  bd <- eventReactive(input$actualizar,{
-    tibble(a = sample(1:5,5), b = sample(6:10,5))
-  })
-  
   # Módulo de encuestas
-  callModule(mod_encuestas_server, "encuestas_ui_1", bd = bd)  
+  callModule(mod_encuestas_server, "encuestas_ui_1")  
   
   # Módulo de redes sociales
   callModule(mod_redes_sociales_server, "redes_sociales_ui_1")
