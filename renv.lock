@@ -394,6 +394,18 @@
       "Repository": "CRAN",
       "Hash": "dcbfac00cf60125f43791a135ef68285"
     },
+    "ggchicklet": {
+      "Package": "ggchicklet",
+      "Version": "0.5.2",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "hrbrmstr",
+      "RemoteRepo": "ggchicklet",
+      "RemoteRef": "master",
+      "RemoteSha": "70de18b6cd294fe224d92c70d5813b66b0616588",
+      "Hash": "31d11be6a5c6350b3a8833efbe1171fb"
+    },
     "ggfittext": {
       "Package": "ggfittext",
       "Version": "0.9.1",
