@@ -2,10 +2,33 @@
 #' 
 #' @param input,output,session Internal parameters for {shiny}. 
 #'     DO NOT REMOVE.
-#' @import shiny
+#' @import shiny purrr
 #' @noRd
 app_server <- function( input, output, session ) {
   # List the first level callModules here
+  
+  notificaciones <- reactive({
+    tibble::tribble(~estado, ~texto,~icono,~status,~fecha,
+                    "Nuevo León", "Encuesta nueva, Nuevo León", "poll-h","success", ymd("2021-03-02"),
+                    "Michoacán", "Análisis cualitativo electoral, Michoacán", "file-alt","danger", ymd("2021-03-02")
+    ) %>% filter(fecha == today(tzone = "America/Mexico_City"))
+  })
+  
+  
+  output$notificaciones <- renderMenu({
+    dropdownMenu(
+      type = "notifications", badgeStatus = "success",
+      headerText = 
+        if(nrow(notificaciones()) > 1) glue::glue("Tiene {nrow(notificaciones())} nuevas actualizaciones el día de hoy") else if(nrow(notificaciones()) == 1)"Tiene 1 nueva actualización el día de hoy" else "No tiene actualizaciones el día de hoy",
+      
+      .list = notificaciones() %>% pmap(function(texto, icono, status, ...){
+        notificationItem(icon = icon(icono), status = status, 
+                         texto)
+      })
+      
+    )
+    
+  })
   
   # Módulo de encuestas
   callModule(mod_encuestas_server, "encuestas_ui_1")  

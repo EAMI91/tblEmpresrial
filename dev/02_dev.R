@@ -30,6 +30,8 @@ usethis::use_package("ggchicklet")
 usethis::use_package("magrittr")
 usethis::use_package("lubridate")
 usethis::use_package("shinycssloaders")
+usethis::use_package("glue")
+usethis::use_package("purrr")
 
 
 ## Add modules ----

@@ -10,17 +10,26 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # List the first level UI elements here 
     dashboardPage(
-      header = dashboardHeader(title = "Tablero empresarial"),
+      header = dashboardHeader(title = "Tablero empresarial",
+                               tags$li(class = "dropdown",
+                                       tags$li(class = "dropdown",
+                                               div(
+                                                 selectInput("entidad",label = NULL,choices = c("Michoacán","Nuevo León"))   
+                                               )
+                                       )
+                               ),
+                               dropdownMenuOutput("notificaciones")
+      ),
       sidebar =  dashboardSidebar(
         sidebarMenu(
           menuItem("Encuestas", tabName = "encuestas",
-                   icon = icon("th")),
+                   icon = icon("poll-h")),
           menuItem("Redes sociales", tabName = "red_social",
                    icon = icon("twitter-square")),
           menuItem("Noticias", tabName = "noticias",
                    icon = icon("newspaper")),
           menuItem("Análisis electoral", tabName = "a_electoral",
-                   icon = icon("newspaper"))
+                   icon = icon("file-alt"))
         )
         
       ),
@@ -28,10 +37,10 @@ app_ui <- function(request) {
         tabItems(
           tabItem(tabName = "encuestas",
                   mod_encuestas_ui("encuestas_ui_1")
-                  ),
+          ),
           tabItem(tabName = "red_social",
                   mod_redes_sociales_ui("redes_sociales_ui_1")
-                  ),
+          ),
           tabItem(tabName = "noticias",
                   mod_noticias_ui("noticias_ui_1")
           ),
@@ -57,7 +66,7 @@ golem_add_external_resources <- function(){
   add_resource_path(
     'www', app_sys('app/www')
   )
- 
+  
   tags$head(
     favicon(),
     bundle_resources(
