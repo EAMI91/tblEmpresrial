@@ -30,6 +30,15 @@ app_server <- function( input, output, session ) {
     
   })
   
+  entidad <- reactive({
+    input$entidad
+  })
+  # Módulo de candidatos
+  observe({
+    callModule(mod_candidatos_server, "candidatos_ui_1", entidad = entidad)  
+  })
+  
+  
   # Módulo de encuestas
   callModule(mod_encuestas_server, "encuestas_ui_1")  
   

@@ -40,6 +40,7 @@ golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
 golem::add_module( name = "redes_sociales", fct = "graficas" ) # Name of the module
 golem::add_module( name = "noticias", fct = "graficas" )
 golem::add_module( name = "a_electoral", fct = "graficas" )
+golem::add_module( name = "candidatos")
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 
@@ -56,6 +57,7 @@ golem::add_css_file( "custom" )
 usethis::use_data_raw( name = "imgs") 
 usethis::use_data_raw( name = "bd_pop") 
 usethis::use_data_raw(name = "puntos_pop")
+usethis::use_data_raw(name = "candidatos")
 
 ## Tests ----
 ## Add one line by test you want to create

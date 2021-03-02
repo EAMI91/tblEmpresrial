@@ -22,6 +22,8 @@ app_ui <- function(request) {
       ),
       sidebar =  dashboardSidebar(
         sidebarMenu(
+          menuItem("Candidatos", tabName = "candidatos",
+                   icon = icon("user")),
           menuItem("Encuestas", tabName = "encuestas",
                    icon = icon("poll-h")),
           menuItem("Redes sociales", tabName = "red_social",
@@ -35,6 +37,9 @@ app_ui <- function(request) {
       ),
       body = dashboardBody(
         tabItems(
+          tabItem(tabName = "candidatos",
+                  mod_candidatos_ui("candidatos_ui_1")
+          ),
           tabItem(tabName = "encuestas",
                   mod_encuestas_ui("encuestas_ui_1")
           ),
