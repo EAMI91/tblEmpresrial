@@ -21,7 +21,11 @@ library(magrittr)
 library(dplyr)
 library(lubridate)
 library(highcharter)
-
+library(quanteda)
+library(rtweet)
+library(ggplot2)
+library(quanteda.textplots)
+library(here)
 
 ```
 
@@ -113,3 +117,95 @@ graficando_saldo <- function(bd){
 graficando_saldo(bd)
 
 ```
+
+```{r}
+load(here("data", "candidatos.rda"))
+candidatos <- filter(candidatos, candidato=="Candidato 1")
+words <- select(candidatos, text)
+
+procesando_nube <- function(DB){
+DB$sentido = sample(c("Negativo", "Positivo"), 
+                       size = nrow(DB), replace = T, prob = c(.5, .5))
+corp_quanteda <- corpus(DB)
+Nube <- dfm(corp_quanteda, remove = stopwords("spanish"), 
+            remove_punct = TRUE, groups = "sentido")
+
+
+}
+
+graficando_nube <- function(DB){
+  nube <- textplot_wordcloud(Nube, comparison = TRUE, max_words = 300, adjust = 0, 
+                   rotation   = 0.1, random_order = FALSE,random_color = FALSE,
+                   ordered_color = FALSE,
+                   color = c("#cb2833", "#0f4c42")) + theme_minimal()
+  return(nube)
+}
+
+Nube <- procesando_nube(words)
+graficando_nube(Nube)
+
+
+```
+
+```{r}
+procesando_nube <- function(DB){
+DB$sentido = sample(c("Negativo", "Positivo"), 
+                       size = 3199, replace = T, prob = c(.5, .5))
+corp_quanteda <- corpus(DB)
+Nube <- dfm(corp_quanteda, remove = stopwords("spanish"), 
+            remove_punct = TRUE, groups = "sentido")
+
+
+}
+
+Nube <- procesando_nube(words)
+
+procesando_red_menciones <- function(DB){
+tag_dfm <- dfm_select(DB, pattern = ("@*"))
+toptag <- names(topfeatures(tag_dfm, 20))
+tag_fcm <- fcm(tag_dfm)
+topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+}
+
+red <- procesando_red_menciones(Nube)
+
+graficando_red <- function(DB){
+textplot_network(DB,
+                 min_freq = 0.1, edge_alpha = 0.8, 
+                 edge_size = 5)
+
+}
+
+graficando_red(red)
+
+
+```
+
+```{r}
+
+
+Nube <- procesando_nube(words)
+
+procesando_red_hashtag <- function(DB){
+tag_dfm <- dfm_select(DB, pattern = ("#*"))
+toptag <- names(topfeatures(tag_dfm, 20))
+tag_fcm <- fcm(tag_dfm)
+topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+}
+
+red <- procesando_red_hashtag(Nube)
+
+graficando_red <- function(DB){
+textplot_network(DB,
+                 min_freq = 0.1, edge_alpha = 0.8, 
+                 edge_size = 5)
+
+}
+
+graficando_red(red)
+
+
+
+
+```
+
