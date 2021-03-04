@@ -59,7 +59,8 @@ golem::add_css_file( "custom" )
 
 ## Add internal datasets ----
 ## If you have data in your package
-usethis::use_data_raw( name = "imgs") 
+usethis::use_data_raw( name = "imgs")
+usethis::use_data_raw( name = "imgs_cand")
 usethis::use_data_raw( name = "bd_pop") 
 usethis::use_data_raw(name = "puntos_pop")
 usethis::use_data_raw(name = "candidatos")

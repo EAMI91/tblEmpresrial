@@ -21,7 +21,7 @@ mod_candidatos_server <- function(input, output, session, entidad){
   ns <- session$ns
   
   bd <- reactive({
-    candidatos %>% filter(Entidad == !!entidad()) %>% 
+    imgs_cand %>% filter(Entidad == !!entidad()) %>% 
       mutate(img = glue::glue("inst/{entidad()}/Gobernador/{`Foto formal`}"),
              nacimiento = glue::glue("{`Lugar de nacimiento`} ({format(`Fecha de nacimiento`,'%d %B %y')})"),
              texto = paste(Candidato,Partido,nacimiento,Estudios,`Cargo actual`,`Perfil político`,sep = "\n"))

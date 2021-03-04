@@ -131,6 +131,7 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
   })
   
   nube <- reactive({
+    browser()
     candidatos <- filter(candidatos, entidad==!!entidad())
     candidatos <- filter(candidatos, candidato==!!input$candidato)
     words <- select(candidatos, text)
