@@ -23,11 +23,14 @@ usethis::use_package("ggplot2")
 usethis::use_package("tibble")
 usethis::use_package("magrittr")
 usethis::use_package("lubridate")
-usethis::use_package("quanteda")
 usethis::use_package("rtweet")
 usethis::use_package("quanteda.textplots")
 usethis::use_package("here")
-
+usethis::use_package("quanteda")
+usethis::use_package("plotly")
+usethis::use_package("tidyr")
+usethis::use_package("ggfittext")
+usethis::use_package("ggthemes")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -58,6 +61,7 @@ usethis::use_test( "app" )
 
 ## Vignette ----
 usethis::use_vignette("redes_sociales")
+usethis::use_vignette("noticias")
 devtools::build_vignettes()
 
 ## Code coverage ----
