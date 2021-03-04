@@ -7,14 +7,18 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-#' @import dplyr highcharter ggplot2 tibble
+#' @import dplyr highcharter ggplot2 tibble lubridate
 mod_redes_sociales_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(width = 12, 
+      column(width = 6, 
+             selectInput(ns("entidad"), label = "Seleccione entidad", choices = c("Michoacán", "Nuevo León"), selected = "Michoacán")
+      ),
+      column(width = 6, 
              selectInput(ns("candidato"), label = "Selecciones candidato", choices = c("Candidato 1", "Candidato 2", "Candidato 3"), selected = "Candidato 1")
-      )
+      ) 
+
     ),
     fluidRow(
       column(width = 12,class="shadowBox",
@@ -23,11 +27,26 @@ mod_redes_sociales_ui <- function(id){
     ), 
 
     fluidRow(
-      column(width = 12, class="shadowBox",
+      column(width = 6, class="shadowBox",
              highchartOutput(ns("saldo"))
-      )
-    )
+      ), 
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(
+               plotOutput(ns("nube"))
+             ))    
  
+  ), 
+  fluidRow(
+    column(width = 6, class="shadowBox",
+           plotOutput(ns("mencion"))
+    ), 
+    column(width = 6, class="shadowBox",
+           shinycssloaders::withSpinner(
+             plotOutput(ns("hashtag"))
+           ))    
+    
+  )
+  
   )
 }
     
@@ -42,19 +61,29 @@ mod_redes_sociales_server <- function(input, output, session){
     tempo1 <- tibble( grupo = sample(c("Tweet", "Menciones", "RT", "Likes"),
                                         prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
                          fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T ), 
+                         entidad = sample(c("Michoacán", "Nuevo León"), 
+                                          size = 100, replace = T, 
+                                          prob = c(.5, .5)),
                          candidato = "Candidato 1")
     tempo2 <- tibble( grupo = sample(c("Tweet", "Menciones", "RT", "Likes"),
                                      prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
-                      fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T ), 
+                      fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T ),
+                      entidad = sample(c("Michoacán", "Nuevo León"), 
+                                       size = 100, replace = T, 
+                                       prob = c(.5, .5)),
                       candidato = "Candidato 2")
     
     tempo3 <- tibble( grupo = sample(c("Tweet", "Menciones", "RT", "Likes"),
                                      prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
                       fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T ), 
+                      entidad = sample(c("Michoacán", "Nuevo León"), 
+                                       size = 100, replace = T, 
+                                       prob = c(.5, .5)),
                       candidato = "Candidato 3")
       proyectos <- bind_rows(tempo1, tempo2)
       
       proyectos <- bind_rows(proyectos, tempo3) %>% 
+      filter(entidad==!!input$entidad) %>% 
       filter(candidato==!!input$candidato) %>% 
       arrange(fecha) %>% 
       group_by(fecha, grupo) %>%
@@ -66,12 +95,18 @@ mod_redes_sociales_server <- function(input, output, session){
   output$saldo <- renderHighchart({
     tempo1 <- tibble(votos = sample(30:78, size = 172, replace = T),
                      voto = sample(c("Negativo", "Positivo"), size = 172, replace = T, prob = c(.5, .5)), 
+                     entidad = sample(c("Michoacán", "Nuevo León"), 
+                                      size = 172, replace = T, 
+                                      prob = c(.5, .5)),
                      candidato = "Candidato 1") %>%
       mutate(mes = cut(votos,c(17,29,39,49,59,69,79, 89,100),
                        labels = c("Semana 1", "Semana 2", "Semana 3", "Semana 4", "Semana 5", "Semana 6", "Semana 7", "Semana 8"))) 
     
     tempo2 <- tibble(votos = sample(30:78, size = 172, replace = T),
                      voto = sample(c("Negativo", "Positivo"), size = 172, replace = T, prob = c(.5, .5)), 
+                     entidad = sample(c("Michoacán", "Nuevo León"), 
+                                      size = 172, replace = T, 
+                                      prob = c(.5, .5)),
                      candidato = "Candidato 2") %>%
       mutate(mes = cut(votos,c(17,29,39,49,59,69,79, 89,100),
                        labels = c("Semana 1", "Semana 2", "Semana 3", "Semana 4", "Semana 5", "Semana 6", "Semana 7", "Semana 8"))) 
@@ -79,13 +114,16 @@ mod_redes_sociales_server <- function(input, output, session){
     
     tempo3 <- tibble(votos = sample(30:78, size = 172, replace = T),
                      voto = sample(c("Negativo", "Positivo"), size = 172, replace = T, prob = c(.5, .5)), 
+                     entidad = sample(c("Michoacán", "Nuevo León"), 
+                                      size = 172, replace = T, 
+                                      prob = c(.5, .5)),
                      candidato = "Candidato 3") %>%
       mutate(mes = cut(votos,c(17,29,39,49,59,69,79, 89,100),
                        labels = c("Semana 1", "Semana 2", "Semana 3", "Semana 4", "Semana 5", "Semana 6", "Semana 7", "Semana 8"))) 
     
     df <- bind_rows(tempo1, tempo2)
-    
     df <- bind_rows(df, tempo3)%>%
+      filter(entidad==!!input$entidad) %>% 
       filter(candidato==!!input$candidato) %>% 
       count(mes, voto) %>%
       mutate(n = as.double(n),
@@ -95,7 +133,36 @@ mod_redes_sociales_server <- function(input, output, session){
     graficando_saldo(df)
   })
   
+  nube <- reactive({
+    candidatos <- filter(candidatos, entidad==!!input$entidad)
+    candidatos <- filter(candidatos, candidato==!!input$candidato)
+    words <- select(candidatos, text)
+    procesando_nube(words)
+  })
   
+  output$nube <- renderPlot({
+    graficando_nube(nube())
+    })
+  
+  output$mencion <- renderPlot({
+    # load("~/Documents/Git/tblEmpresrial/data/candidatos.rda")
+    # candidatos <- filter(candidatos, entidad==!!input$entidad)
+    # candidatos <- filter(candidatos, candidato==!!input$candidato)
+    # words <- select(candidatos, text)
+    # Nube <- procesando_nube(words)
+    red_menciones <- procesando_red_menciones(nube())
+    graficando_red(red_menciones)
+  })
+  
+  output$hashtag <- renderPlot({
+    # load("~/Documents/Git/tblEmpresrial/data/candidatos.rda")
+    # candidatos <- filter(candidatos, entidad==!!input$entidad)
+    # candidatos <- filter(candidatos, candidato==!!input$candidato)
+    # words <- select(candidatos, text)
+    # Nube <- procesando_nube(words)
+    red_hashtag <- procesando_red_hashtag(nube())
+    graficando_red(red_hashtag)
+  })
  
 }
     

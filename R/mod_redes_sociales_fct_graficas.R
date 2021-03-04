@@ -1,8 +1,10 @@
-library(magrittr)
-library(dplyr)
-library(lubridate)
-library(highcharter)
-
+# library(magrittr)
+# library(dplyr)
+# library(lubridate)
+# library(highcharter)
+# library(quanteda)
+# library(quanteda.textplots)
+# library(here)
 
 reach <- function(bd){
   hchart(bd, hcaes(x = fecha, y = n, group = grupo), type = "line") %>%
@@ -38,6 +40,7 @@ reach <- function(bd){
 }
 
 
+ #reach(proyectos)
 
 graficando_saldo <- function(df){
   hchart(df, hcaes(y = n2, group = voto, x = mes), type = "bar") %>%
@@ -64,6 +67,58 @@ graficando_saldo <- function(df){
   
 }
 
+
+
+
+#### Nube-----
+
+
+
+
+
+procesando_nube <- function(DB){
+DB$sentido = sample(c("Negativo", "Positivo"), 
+                       size = nrow(DB), replace = T, prob = c(.5, .5))
+corp_quanteda <- corpus(DB)
+dfm(corp_quanteda, remove = stopwords("spanish"), 
+            remove_punct = TRUE, groups = "sentido")
+
+}
+
+graficando_nube <- function(DB){
+  nube <- textplot_wordcloud(DB, comparison = TRUE, 
+                             max_words = 100, adjust = 0, 
+                   rotation   = 0, random_order = FALSE,
+                   random_color = FALSE,fixed_aspect=TRUE,
+                   ordered_color = FALSE,
+                   color = c("#f03b20", "#31a354")) + theme_minimal()
+  return(nube)
+}
+
+
+### Redes-----
+
+procesando_red_menciones <- function(DB){
+  tag_dfm <- dfm_select(DB, pattern = ("@*"))
+  toptag <- names(topfeatures(tag_dfm, 20))
+  tag_fcm <- fcm(tag_dfm)
+  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+}
+
+graficando_red <- function(DB){
+  textplot_network(DB,
+                   min_freq = 0.1, edge_alpha = 0.5, 
+                   edge_size = 5)
+  
+}
+
+
+procesando_red_hashtag <- function(DB){
+  tag_dfm <- dfm_select(DB, pattern = ("#*"))
+  toptag <- names(topfeatures(tag_dfm, 20))
+  tag_fcm <- fcm(tag_dfm)
+  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+}
 
 
 
