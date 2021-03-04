@@ -16,7 +16,7 @@ comb <- cross2(entidades,analisis)
 
 archivos <- comb %>% map(~{
   setwd(glue::glue("~/Documents/Git/tblEmpresrial/inst/{.x[[1]][[1]]}/{.x[[2]][[1]]}"))
-  imgs <- pdftools::pdf_convert(here(glue::glue('inst/{.x[[1]][[2]]}_{.x[[2]][[1]]}.pdf')),format = 'png',verbose = FALSE,)
+  imgs <- pdftools::pdf_convert(here(glue::glue('inst/{.x[[1]][[2]]}_{.x[[2]][[1]]}.pdf')),format = 'png',verbose = FALSE,dpi = 300)
   pdfs <- paste("inst",.x[[1]][[1]],.x[[2]][[1]],imgs,sep = "/")  
 })
 
