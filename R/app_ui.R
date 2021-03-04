@@ -24,14 +24,21 @@ app_ui <- function(request) {
         sidebarMenu(
           menuItem("Candidatos", tabName = "candidatos",
                    icon = icon("user")),
-          menuItem("Encuestas", tabName = "encuestas",
-                   icon = icon("poll-h")),
-          menuItem("Redes sociales", tabName = "red_social",
-                   icon = icon("twitter-square")),
-          menuItem("Noticias", tabName = "noticias",
-                   icon = icon("newspaper")),
-          menuItem("Análisis electoral", tabName = "a_electoral",
-                   icon = icon("file-alt"))
+          menuItem("Encuestas", tabName = "enc",
+                   icon = icon("poll-h"),
+                   menuSubItem(text = "Gráficas",tabName = "encuestas"),
+                   menuSubItem(text = "Análisis",tabName = "enc_pdf")),
+          menuItem("Redes sociales", tabName = "rs",
+                   icon = icon("twitter-square"),
+                   menuSubItem(text = "Gráficas",tabName = "red_social"),
+                   menuSubItem(text = "Análisis",tabName = "rs_pdf")),
+          menuItem("Noticias", tabName = "not",
+                   icon = icon("newspaper"),
+                   menuSubItem(text = "Gráficas",tabName = "noticias"),
+                   menuSubItem(text = "Análisis",tabName = "not_pdf")),
+          menuItem("Análisis electoral", tabName = "ae",
+                   icon = icon("file-alt")
+                   )
         )
         
       ),
@@ -43,14 +50,23 @@ app_ui <- function(request) {
           tabItem(tabName = "encuestas",
                   mod_encuestas_ui("encuestas_ui_1")
           ),
+          tabItem(tabName = "enc_pdf",
+                  mod_análisis_ui("análisis_ui_1")
+          ),
           tabItem(tabName = "red_social",
                   mod_redes_sociales_ui("redes_sociales_ui_1")
+          ),
+          tabItem(tabName = "rs_pdf",
+                  mod_análisis_ui("análisis_ui_2")
           ),
           tabItem(tabName = "noticias",
                   mod_noticias_ui("noticias_ui_1")
           ),
-          tabItem(tabName = "a_electoral",
-                  mod_a_electoral_ui("a_electoral_ui_1")
+          tabItem(tabName = "not_pdf",
+                  mod_análisis_ui("análisis_ui_3")
+          ),
+          tabItem(tabName = "ae",
+                  mod_análisis_ui("análisis_ui_4")
           )
         )
       )

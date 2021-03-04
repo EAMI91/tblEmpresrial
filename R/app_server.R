@@ -2,7 +2,7 @@
 #' 
 #' @param input,output,session Internal parameters for {shiny}. 
 #'     DO NOT REMOVE.
-#' @import shiny purrr
+#' @import shiny purrr slickR
 #' @noRd
 app_server <- function( input, output, session ) {
   # List the first level callModules here
@@ -48,6 +48,10 @@ app_server <- function( input, output, session ) {
   #Módulo de noticias
   callModule(mod_noticias_server, "noticias_ui_1")
   
-  #Módulo de análisis electoral cualitativo
-  callModule(mod_a_electoral_server, "a_electoral_ui_1")
+  #Análisis
+  
+  callModule(mod_análisis_server, "análisis_ui_1",tipo = "encuestas", entidad = entidad)
+  callModule(mod_análisis_server, "análisis_ui_2",tipo = "redes", entidad = entidad)
+  callModule(mod_análisis_server, "análisis_ui_3",tipo = "noticias", entidad = entidad)
+  callModule(mod_análisis_server, "análisis_ui_4",tipo = "electoral", entidad = entidad)
 }

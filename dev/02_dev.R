@@ -39,8 +39,8 @@ usethis::use_package("purrr")
 golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
 golem::add_module( name = "redes_sociales", fct = "graficas" ) # Name of the module
 golem::add_module( name = "noticias", fct = "graficas" )
-golem::add_module( name = "a_electoral", fct = "graficas" )
 golem::add_module( name = "candidatos")
+golem::add_module( name = "análisis")
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 
