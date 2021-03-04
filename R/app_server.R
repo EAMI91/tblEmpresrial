@@ -9,8 +9,8 @@ app_server <- function( input, output, session ) {
   
   notificaciones <- reactive({
     tibble::tribble(~estado, ~texto,~icono,~status,~fecha,
-                    "Nuevo León", "Encuesta nueva, Nuevo León", "poll-h","success", ymd("2021-03-02"),
-                    "Michoacán", "Análisis cualitativo electoral, Michoacán", "file-alt","danger", ymd("2021-03-02")
+                    "Nuevo León", "Encuesta nueva, Nuevo León", "poll-h","success", today(),#ymd("2021-03-02"),
+                    "Michoacán", "Análisis cualitativo electoral, Michoacán", "file-alt","danger", today() #ymd("2021-03-02")
     ) %>% filter(fecha == today(tzone = "America/Mexico_City"))
   })
   
