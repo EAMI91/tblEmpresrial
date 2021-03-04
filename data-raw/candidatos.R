@@ -1,8 +1,5 @@
 ## code to prepare `candidatos` dataset goes here
-<<<<<<< HEAD
-library(readr)
-candidatos <- read_csv("data-raw/aspirantes_prueba_mich_qro_nl.csv")%>% mutate(`Fecha de nacimiento` = lubridate::dmy(`Fecha de nacimiento`))
-=======
+
 
 load(here::here("data", "FSM.rda"))
 load(here::here("data", "candidato2.rda"))
@@ -22,5 +19,4 @@ candidatos <- bind_rows(candidatos, candidato3)
 candidatos$entidad <- sample(c("Michoacán", "Nuevo León"), 
                              size = nrow(candidatos), replace = T, prob = c(.5, .5))
 
->>>>>>> redes_sociales
 usethis::use_data(candidatos, overwrite = TRUE)

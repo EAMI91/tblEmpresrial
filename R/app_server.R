@@ -2,7 +2,7 @@
 #' 
 #' @param input,output,session Internal parameters for {shiny}. 
 #'     DO NOT REMOVE.
-#' @import shiny purrr slickR
+#' @import shiny purrr slickR rtweet
 #' @noRd
 app_server <- function( input, output, session ) {
   # List the first level callModules here
@@ -43,7 +43,7 @@ app_server <- function( input, output, session ) {
   callModule(mod_encuestas_server, "encuestas_ui_1")  
   
   # Módulo de redes sociales
-  callModule(mod_redes_sociales_server, "redes_sociales_ui_1")
+  callModule(mod_redes_sociales_server, "redes_sociales_ui_1", entidad = entidad)
   
   #Módulo de noticias
   callModule(mod_noticias_server, "noticias_ui_1")

@@ -13,9 +13,6 @@ mod_redes_sociales_ui <- function(id){
   tagList(
     fluidRow(
       column(width = 6, 
-             selectInput(ns("entidad"), label = "Seleccione entidad", choices = c("Michoacán", "Nuevo León"), selected = "Michoacán")
-      ),
-      column(width = 6, 
              selectInput(ns("candidato"), label = "Selecciones candidato", choices = c("Candidato 1", "Candidato 2", "Candidato 3"), selected = "Candidato 1")
       ) 
 
@@ -53,7 +50,7 @@ mod_redes_sociales_ui <- function(id){
 #' redes_sociales Server Function
 #'
 #' @noRd 
-mod_redes_sociales_server <- function(input, output, session){
+mod_redes_sociales_server <- function(input, output, session, entidad){
   ns <- session$ns
   
   
@@ -83,7 +80,7 @@ mod_redes_sociales_server <- function(input, output, session){
       proyectos <- bind_rows(tempo1, tempo2)
       
       proyectos <- bind_rows(proyectos, tempo3) %>% 
-      filter(entidad==!!input$entidad) %>% 
+      filter(entidad==!! entidad()) %>% 
       filter(candidato==!!input$candidato) %>% 
       arrange(fecha) %>% 
       group_by(fecha, grupo) %>%
@@ -123,7 +120,7 @@ mod_redes_sociales_server <- function(input, output, session){
     
     df <- bind_rows(tempo1, tempo2)
     df <- bind_rows(df, tempo3)%>%
-      filter(entidad==!!input$entidad) %>% 
+      filter(entidad==!!entidad()) %>% 
       filter(candidato==!!input$candidato) %>% 
       count(mes, voto) %>%
       mutate(n = as.double(n),
@@ -134,7 +131,7 @@ mod_redes_sociales_server <- function(input, output, session){
   })
   
   nube <- reactive({
-    candidatos <- filter(candidatos, entidad==!!input$entidad)
+    candidatos <- filter(candidatos, entidad==!!entidad())
     candidatos <- filter(candidatos, candidato==!!input$candidato)
     words <- select(candidatos, text)
     procesando_nube(words)
@@ -146,7 +143,7 @@ mod_redes_sociales_server <- function(input, output, session){
   
   output$mencion <- renderPlot({
     # load("~/Documents/Git/tblEmpresrial/data/candidatos.rda")
-    # candidatos <- filter(candidatos, entidad==!!input$entidad)
+    # candidatos <- filter(candidatos, entidad==!!entidad())
     # candidatos <- filter(candidatos, candidato==!!input$candidato)
     # words <- select(candidatos, text)
     # Nube <- procesando_nube(words)
@@ -156,7 +153,7 @@ mod_redes_sociales_server <- function(input, output, session){
   
   output$hashtag <- renderPlot({
     # load("~/Documents/Git/tblEmpresrial/data/candidatos.rda")
-    # candidatos <- filter(candidatos, entidad==!!input$entidad)
+    # candidatos <- filter(candidatos, entidad==!!entidad())
     # candidatos <- filter(candidatos, candidato==!!input$candidato)
     # words <- select(candidatos, text)
     # Nube <- procesando_nube(words)
