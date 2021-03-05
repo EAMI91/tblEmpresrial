@@ -1,6 +1,9 @@
 ## code to prepare `imgs` dataset goes here
 library(pdftools)
 library(here)
+library(purrr)
+library(dplyr)
+library(tidyr)
 # entidades <- tibble::tribble(~nombre, ~min,
 #                 "Michoacán","MICH",
 #                 "Nuevo León", "NL"
@@ -48,3 +51,4 @@ fechas <- read_csv(here("data-raw","fechas.csv"))
 # write_excel_csv(here("data-raw","fechas.csv"),x = fechas)
 imgs <- fechas %>% left_join(archivos) 
 usethis::use_data(imgs, overwrite = TRUE)
+setwd("~/Documents/Git/tblEmpresrial")
