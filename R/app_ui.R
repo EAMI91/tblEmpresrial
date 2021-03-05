@@ -10,7 +10,16 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # List the first level UI elements here 
     dashboardPage(
-      header = dashboardHeader(title = "Tablero empresarial"),
+      header = dashboardHeader(title = "Tablero empresarial",
+                               tags$li(class = "dropdown",
+                                       tags$li(class = "dropdown",
+                                               div(
+                                                 selectInput("entidad",label = NULL,choices = c("Michoacán","Nuevo León"))   
+                                               )
+                                       )
+                               ),
+                               dropdownMenuOutput("notificaciones")
+      ),
       sidebar =  dashboardSidebar(
         sidebarMenu(
           menuItem("Encuestas", tabName = "encuestas",

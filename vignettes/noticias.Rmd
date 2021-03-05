@@ -39,7 +39,7 @@ v <- rep("Este es un texto a ser noticia", n)
 A <- tibble(id = 1:n,
             title = v) 
 
-X <- sample(c("Buena", "Mala", "Regular"), n, replace=T) 
+X <- sample(c("Buena", "Mala", "Regular"),prob = c(.2,.2 ,.6), n, replace=T) 
 
 B <- tibble(id = 1:n, calificacion = X)
 
@@ -69,13 +69,12 @@ timeline_noticias <- function(bd){
   
   
 hc <- bd %>% 
-  hchart(
-    'spline', hcaes(x = fecha, y = Noticias, group = calificacion)
+  hchart(hcaes(x = fecha, y = Noticias, group = calificacion), type="line"
   )  %>%
   hc_colors(c("#710627", "#CF8C40", "#BBC200")) %>% 
-  hc_plotOptions(spline= list(lineWidth = 5,
-                            marker = list(radius =0),
-                            stickyTracking=F)) %>% 
+  hc_plotOptions(line= list(lineWidth = 4,
+                              marker = list(radius =0),
+                              stickyTracking=F)) %>% 
   hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
            lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
            showLastLabel= F,
@@ -101,7 +100,7 @@ hc <- bd %>%
 ```
 # Timeline
 ```{r}
-E %>%  mutate(calificacion = factor(calificacion, c("Mala", "Regular", "Buena"))) %>%  timeline_noticias()
+E %>%  mutate(calificacion = factor(calificacion, c("Mala", "Regular", "Buena"))) %>% timeline_noticias()
 ```
 
 ```{r}
@@ -569,5 +568,281 @@ calificada_no_generada <- function(bd, cand){
 
 ```{r}
 calificada_no_generada(BD,  cand = "candidato 2")
+```
+
+```{r}
+#Eventos treemap
+colores <- c("#174a80", "#00A896",
+             "#0f4c42", "#cb2833", "#91d400","#ffc200")
+Eventos <- tibble(id = 1:n,
+tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
+candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T)
+)
+
+Eventos %>% count(candidato, tipoEvento) %>% 
+  hchart(hcaes(x = tipoEvento, y = n, group = candidato), type = "bar") %>%
+  hc_title(text = "Tipo de Eventos") %>% 
+  hc_colors(c("#174a80", "#00A896",
+             "#0f4c42", "#cb2833"))
+
+```
+```{r}
+
+percep <- tibble(id = 1:n, 
+percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+)
+
+BD <- left_join(Eventos, percep) 
+      BD%>% 
+      count(candidato, percepcion) %>% 
+      group_by(candidato) %>% 
+      mutate(totales= sum(n)) %>% 
+      ungroup() %>% 
+      mutate(porc=round((n/totales)*100, 2)) %>%  
+  hchart(hcaes(x = percepcion, y = porc, group = candidato), type = "bar") %>%
+  hc_title(text = "Percepción") %>% 
+  hc_colors(colores)
+
+
+
+```
+
+```{r}
+n <- 1000
+    BD <- tibble(
+    id = 1:n,
+    tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
+    candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T),
+    percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+    mencionGenerada = sample(c("Boletines\n de prensa", "declaraciones", "filtraciones"), n, replace = T),
+    mencionNoGenerada = sample(c("personaje", "columnista", "adversario", "partidario"), n, replace = T),
+    calif_generada = sample(c("Mala", "Buena", "Regular"), n, replace = T),
+    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T)
+    )
+
+barras_candidatos <- function(bd, candidatos, col, title){
+  
+  bd <- bd %>%
+    mutate(n  =  1) %>%
+    group_by(!!sym(col), candidato) %>%
+    summarise(across(n, sum)) %>% 
+    mutate(percentage =round(100*n/sum(n))) %>% 
+    mutate(label = paste(round(percentage, 1), "%", sep = " "))
+  
+  Graph <- hchart(bd, hcaes(x = !!sym(col), y = percentage, group = candidato), 
+         type = "bar") %>%
+    hc_title(text = as.character(title)) %>% 
+        hc_xAxis(title = "") %>% 
+      hc_colors(c("#174a80", "#00A896",
+                "#0f4c42", "#cb2833")) %>%
+  hc_plotOptions(bar = list(stacking = F, borderRadius = 5,
+                            dataLabels= list(enabled =F,
+                                             align= "center",
+                                             inside= F,
+                                             # rotation = 5,
+                                             verticalAlign= 'top',
+                                             # x = -5,
+                                             crop= F,
+                                             overflow= "none",
+                                             style=list(color="BLACK", fontSize = "25px", textOutline= "3px contrast"),
+                                             format = paste0("{point.n:,.0f} ")
+                            )
+  ))
+  
+
+
+    
+  return(Graph)
+}
+
+ barras_candidatos(BD, c("candidato 1", "candidato 2", "candidato 3"),
+                      col="percepcion", title="Percepción en Medios")
+
+```
+```{r}
+
+barras_candidatos(BD, c("candidato 1", "candidato 2", "candidato 3"),
+                      col="mencionGenerada", "Menciones del candidato generadas")
+
+
+```
+
+
+
+```{r}
+library(readr)
+
+url_base <- "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv"
+
+pkmnes <- read_csv(file.path(url_base, "pokemon.csv"))
+pkmnes
+
+pkmn_nombre_tipos <- read_csv(file.path(url_base, "type_names.csv")) %>% 
+  # inglés es 9, Japonez es 1, español 7
+  filter(local_language_id == 9)
+
+pkmn_tipo <- read_csv(file.path(url_base, "pokemon_types.csv"))
+pkmn_tipo <- pkmn_tipo %>% 
+  mutate(slot = paste0("type_", slot)) %>% 
+  left_join(pkmn_nombre_tipos, by = "type_id") %>% 
+  select(pokemon_id, slot, name) %>% 
+  spread(slot, name)
+
+
+
+
+pkmn_colores_tipo <- pkmn_nombre_tipos %>% 
+  pull(name) %>% 
+  setdiff(c("???", "Shadow")) %>% 
+  purrr::map_df(function(t){
+  # t <- "psychic"
+  message(t)
+  
+  col <- "http://pokemon-uranium.wikia.com/wiki/Template:%s_color" %>% 
+    sprintf(t) %>%
+    xml2::read_html() %>% 
+    rvest::html_nodes("span > b") %>% 
+    rvest::html_text()
+  
+  tibble(type = t, color = paste0("#", col))
+})
+
+pkmn_colores_tipo2 <- crossing(
+  color_1 = pkmn_colores_tipo$color,
+  color_2 = pkmn_colores_tipo$color
+  ) %>% 
+  mutate(
+    color_f = purrr::map2_chr(
+      color_1,
+      color_2,
+      ~ colorRampPalette(c(.x, .y))(100)[round(100 * .25)])
+    )
+
+
+
+pkmn <- pkmnes %>% 
+  left_join(pkmn_tipo, by = c("id" = "pokemon_id")) %>% 
+  left_join(pkmn_colores_tipo %>% rename(type_1 = type, color_1 = color), by = "type_1") %>% 
+  left_join(pkmn_colores_tipo %>% rename(type_2 = type, color_2 = color), by = "type_2") %>% 
+  left_join(pkmn_colores_tipo2, by =  c("color_1", "color_2")) %>% 
+  mutate(color_f = ifelse(is.na(color_f), color_1, color_f))
+
+dprinc <- pkmn %>% 
+  select(name = type_1, color = color_1) %>% 
+  distinct() %>% 
+  mutate(id = str_to_id(name))
+
+dsecun <- pkmn %>% 
+  count(type_1, type_2, color_f) %>% 
+  # los siguiente nombre de columnas son para que highcharts los use 
+  # internamente.
+  transmute(
+    name =  ifelse(is.na(type_2), paste("only", type_1), type_2),
+    parent = str_to_id(type_1),
+    color = color_f,
+    value = n
+    ) %>% 
+  mutate(id = as.character(row_number()))
+
+dd <- list(dprinc, dsecun) %>%
+  purrr::map(mutate_if, is.factor, as.character) %>% 
+  bind_rows() %>% 
+  list_parse() %>% 
+  purrr::map(function(x) x[!is.na(x)])
+
+
+highchart() %>% 
+  hc_chart(type = "treemap") %>% 
+  hc_title(
+    text = "Pokemon por tipos"
+  ) %>% 
+  hc_add_series(
+    data = dsecun,
+    allowDrillToNode = TRUE,
+    levelIsConstant = FALSE,
+    textOverflow = "clip",
+    dataLabels = list(color = "white"),
+    levels = list(
+      list(
+        level = 1,
+        borderWidth = 1,
+        dataLabels = list(
+          enabled = TRUE,
+          verticalAlign = "top",
+          align = "left",
+          style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        )
+      )
+    ) %>% 
+  # esto es para que el primer nivel, que no tiene color asigando, 
+  # sea transparente.
+  hc_colors("trasnparent")
+
+```
+
+
+```{r}
+
+base1 <- BD %>% 
+         select(mencionGenerada) %>% 
+         unique() %>% 
+         mutate(color=if_else(mencionGenerada=="Boletines\n de prensa", "#0f4c42", 
+                      if_else(mencionGenerada=="declaraciones","#cb2833","#808080")),                 
+                      id= if_else(mencionGenerada=="Boletines\n de prensa", "bp", 
+                      if_else(mencionGenerada=="declaraciones","dec","filtraciones")))%>%
+         rename("name"="mencionGenerada")
+
+base2 <- BD %>% 
+         count(percepcion, mencionGenerada) %>% 
+         unique() %>% 
+         mutate(color=if_else(percepcion=="Buena",
+                              "#174a80",                     
+                      if_else(percepcion=="Mala",
+                            "#00A896","#ffc200")),
+                id = as.character(row_number())) %>% 
+        rename("name"= "mencionGenerada", "value"="n", "parent"= "percepcion")
+
+dde <- list(base1, base2) %>%
+  purrr::map(mutate_if, is.factor, as.character) %>% 
+  bind_rows() %>% 
+  list_parse() %>% 
+  purrr::map(function(x) x[!is.na(x)])
+
+highchart() %>% 
+  hc_chart(type = "treemap") %>% 
+  hc_title(
+    text = "Pokemon por tipos"
+  ) %>% 
+  hc_add_series(
+    data = dde,
+    allowDrillToNode = TRUE,
+    levelIsConstant = FALSE,
+    textOverflow = "clip",
+    dataLabels = list(color = "white"),
+    levels = list(
+      list(
+        level = 1,
+        borderWidth = 1,
+        dataLabels = list(
+          enabled = TRUE,
+          verticalAlign = "top",
+          align = "left",
+          style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        ),
+      list(
+        level = 2,
+        borderWidth = 0,
+        dataLabels = list(enabled = FALSE)
+        )
+      )
+    ) %>% 
+  # esto es para que el primer nivel, que no tiene color asigando, 
+  # sea transparente.
+  hc_colors("trasnparent")
+
+
+
 ```
 
