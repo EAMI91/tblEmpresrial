@@ -7,6 +7,11 @@
 app_server <- function( input, output, session ) {
   # List the first level callModules here
   
+  res_auth <- shinymanager::secure_server(
+    check_credentials = shinymanager::check_credentials(db = tibble(user ="admin",
+                                                                    password = "1"))
+  )
+  
   notificaciones <- reactive({
     tibble::tribble(~estado, ~texto,~icono,~status,~fecha,
                     "Nuevo León", "Encuesta nueva, Nuevo León", "poll-h","success", today(),#ymd("2021-03-02"),
@@ -31,6 +36,7 @@ app_server <- function( input, output, session ) {
   })
   
   entidad <- reactive({
+    req(input$entidad)
     input$entidad
   })
   # Módulo de candidatos
