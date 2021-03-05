@@ -32,9 +32,9 @@ mod_candidatos_server <- function(input, output, session, entidad){
       need(nrow(bd())>0,message = "No se ha registrado ningún candidato para esta entidad.")
     )
     imagen <- slickR(
-      bd()$img,height = 500,width = "100%",
+      bd()$img,height = 500,width = "100%",slideId = "candidatos",
     ) + settings(autoplay = T, autoplaySpeed = 5000)
-    texto <- slickR(elementId = "nombre",bd()$texto,slideType = "p") + settings(dots = T, arrows = F)
+    texto <- slickR(elementId = "nombre",bd()$texto,slideType = "p",slideId  = "candidatos2") + settings(dots = T, arrows = F)
     # partido <- slickR(bd()$Partido,slideType = "p") + settings(arrows = F)
     # nacimiento <- slickR(bd()$nacimiento,slideType = "p") + settings(arrows = F)
     # estudios <- slickR(bd()$Estudios,slideType = "p") + settings(arrows = F)

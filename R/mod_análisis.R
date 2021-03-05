@@ -35,7 +35,7 @@ mod_análisis_server <- function(input, output, session, tipo, entidad){
   })
   
   output$pdf <- renderSlickR({
-    slickR(
+    slickR(slideId = tipo,
       out(),height = 700,width = "100%",
     )
   })  
