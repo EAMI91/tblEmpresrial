@@ -98,8 +98,8 @@ mod_noticias_server <- function(input, output, session){
   })
   
   output$nubePalabras <- renderPlot({
-    Nube <- procesando_nube(bd(), 10)
-    graficando_nube(Nube, 10)
+    Nube <- procesando_nube_not(bd(), 10)
+    graficando_nube_not(Nube, 10)
   })
   
   output$termometro <- renderPlotly({

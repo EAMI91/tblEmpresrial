@@ -39,7 +39,7 @@ timeline_noticias <- function(bd){
   return(hc)
 }
 
-procesando_nube <- function(bd, z){
+procesando_nube_not <- function(bd, z){
   words <- select(bd, text, calificacion) %>% na.omit() 
   titulo <- "Temas electoraes"
   corp_quanteda <- corpus(words)
@@ -49,7 +49,7 @@ procesando_nube <- function(bd, z){
   return(Nube)
 }
 
-graficando_nube <- function(db, z){
+graficando_nube_not <- function(db, z){
   nube <- textplot_wordcloud(db, min_count = z,comparison = TRUE, max_words = 300, adjust = 0, rotation   = 0.1, random_order = FALSE,random_color = FALSE, ordered_color = FALSE,
                              # font = "Avenir Next",
                              labelsize= 1.5,
