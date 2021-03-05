@@ -37,6 +37,7 @@ usethis::use_package("quanteda")
 usethis::use_package("rtweet")
 usethis::use_package("quanteda.textplots")
 usethis::use_package("here")
+usethis::use_package("shinymanager")
 
 
 ## Add modules ----
