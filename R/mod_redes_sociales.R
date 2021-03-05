@@ -148,21 +148,11 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
   })
   
   output$mencion <- renderPlot({
-    # load("~/Documents/Git/tblEmpresrial/data/candidatos.rda")
-    # candidatos <- filter(candidatos, entidad==!!entidad())
-    # candidatos <- filter(candidatos, candidato==!!input$candidato)
-    # words <- select(candidatos, text)
-    # Nube <- procesando_nube(words)
     red_menciones <- procesando_red_menciones(nube())
     graficando_red(red_menciones)
   })
   
   output$hashtag <- renderPlot({
-    # load("~/Documents/Git/tblEmpresrial/data/candidatos.rda")
-    # candidatos <- filter(candidatos, entidad==!!entidad())
-    # candidatos <- filter(candidatos, candidato==!!input$candidato)
-    # words <- select(candidatos, text)
-    # Nube <- procesando_nube(words)
     red_hashtag <- procesando_red_hashtag(nube())
     graficando_red(red_hashtag)
   })
