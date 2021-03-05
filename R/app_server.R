@@ -34,9 +34,7 @@ app_server <- function( input, output, session ) {
     input$entidad
   })
   # Módulo de candidatos
-  observe({
-    callModule(mod_candidatos_server, "candidatos_ui_1", entidad = entidad)  
-  })
+  callModule(mod_candidatos_server, "candidatos_ui_1", entidad = entidad)  
   
   
   # Módulo de encuestas
