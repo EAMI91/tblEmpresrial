@@ -15,38 +15,44 @@ mod_redes_sociales_ui <- function(id){
       column(width = 6, 
              selectInput(ns("candidato"), label = "Selecciones candidato", choices = c("Candidato 1", "Candidato 2", "Candidato 3"), selected = "Candidato 1")
       ) 
-
+      
     ),
     fluidRow(
       column(width = 12,class="shadowBox",
-             highchartOutput(ns("reach"))
+             shinycssloaders::withSpinner(
+               highchartOutput(ns("reach")) 
+             )
       )
     ), 
-
+    
     fluidRow(
       column(width = 6, class="shadowBox",
-             highchartOutput(ns("saldo"))
+             shinycssloaders::withSpinner(
+               highchartOutput(ns("saldo"))
+             )
       ), 
       column(width = 6, class="shadowBox",
              shinycssloaders::withSpinner(
                plotOutput(ns("nube"))
              ))    
- 
-  ), 
-  fluidRow(
-    column(width = 6, class="shadowBox",
-           plotOutput(ns("mencion"))
+      
     ), 
-    column(width = 6, class="shadowBox",
-           shinycssloaders::withSpinner(
-             plotOutput(ns("hashtag"))
-           ))    
+    fluidRow(
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(
+             plotOutput(ns("mencion"))
+             )
+      ), 
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(
+               plotOutput(ns("hashtag"))
+             ))    
+      
+    )
     
-  )
-  
   )
 }
-    
+
 #' redes_sociales Server Function
 #'
 #' @noRd 
@@ -56,12 +62,12 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
   
   output$reach <- renderHighchart({
     tempo1 <- tibble( grupo = sample(c("Tweet", "Menciones", "RT", "Likes"),
-                                        prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
-                         fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T ), 
-                         entidad = sample(c("Michoacán", "Nuevo León"), 
-                                          size = 100, replace = T, 
-                                          prob = c(.5, .5)),
-                         candidato = "Candidato 1")
+                                     prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
+                      fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T ), 
+                      entidad = sample(c("Michoacán", "Nuevo León"), 
+                                       size = 100, replace = T, 
+                                       prob = c(.5, .5)),
+                      candidato = "Candidato 1")
     tempo2 <- tibble( grupo = sample(c("Tweet", "Menciones", "RT", "Likes"),
                                      prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
                       fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T ),
@@ -77,9 +83,9 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
                                        size = 100, replace = T, 
                                        prob = c(.5, .5)),
                       candidato = "Candidato 3")
-      proyectos <- bind_rows(tempo1, tempo2)
-      
-      proyectos <- bind_rows(proyectos, tempo3) %>% 
+    proyectos <- bind_rows(tempo1, tempo2)
+    
+    proyectos <- bind_rows(proyectos, tempo3) %>% 
       filter(entidad==!! entidad()) %>% 
       filter(candidato==!!input$candidato) %>% 
       arrange(fecha) %>% 
@@ -139,7 +145,7 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
   
   output$nube <- renderPlot({
     graficando_nube(nube())
-    })
+  })
   
   output$mencion <- renderPlot({
     # load("~/Documents/Git/tblEmpresrial/data/candidatos.rda")
@@ -160,12 +166,12 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
     red_hashtag <- procesando_red_hashtag(nube())
     graficando_red(red_hashtag)
   })
- 
+  
 }
-    
+
 ## To be copied in the UI
 # mod_redes_sociales_ui("redes_sociales_ui_1")
-    
+
 ## To be copied in the server
 # callModule(mod_redes_sociales_server, "redes_sociales_ui_1")
- 
+
