@@ -45,7 +45,7 @@ app_server <- function( input, output, session ) {
   
   
   # Módulo de encuestas
-  callModule(mod_encuestas_server, "encuestas_ui_1")  
+  callModule(mod_encuestas_server, "encuestas_ui_1", entidad = entidad)  
   
   # Módulo de redes sociales
   callModule(mod_redes_sociales_server, "redes_sociales_ui_1", entidad = entidad)
