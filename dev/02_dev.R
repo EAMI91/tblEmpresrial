@@ -17,9 +17,20 @@
 ## Add one line by package you want to add as dependency
 usethis::use_package("dplyr")
 usethis::use_package("shinydashboard")
+usethis::use_package("shinycssloaders")
 usethis::use_package("highcharter")
 usethis::use_package("ggplot2")
 usethis::use_package("tibble")
+usethis::use_package("magrittr")
+usethis::use_package("lubridate")
+usethis::use_package("rtweet")
+usethis::use_package("quanteda.textplots")
+usethis::use_package("here")
+usethis::use_package("quanteda")
+usethis::use_package("plotly")
+usethis::use_package("tidyr")
+usethis::use_package("ggfittext")
+usethis::use_package("ggthemes")
 usethis::use_package("ggchicklet")
 
 ## Add modules ----
@@ -51,6 +62,8 @@ usethis::use_test( "app" )
 # Documentation
 
 ## Vignette ----
+usethis::use_vignette("redes_sociales")
+usethis::use_vignette("noticias")
 usethis::use_vignette("tblEmpresrial")
 usethis::use_vignette("encuestas")
 devtools::build_vignettes()

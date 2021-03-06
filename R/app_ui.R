@@ -2,7 +2,7 @@
 #' 
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
-#' @import shiny shinydashboard
+#' @import shiny shinydashboard magrittr dplyr lubridate highcharter quanteda quanteda.textplots
 #' @noRd
 app_ui <- function(request) {
   tagList(
@@ -10,13 +10,22 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # List the first level UI elements here 
     dashboardPage(
-      header = dashboardHeader(title = "Tablero empresarial"),
+      header = dashboardHeader(title = "Tablero empresarial",
+                               tags$li(class = "dropdown",
+                                       tags$li(class = "dropdown",
+                                               div(
+                                                 selectInput("entidad",label = NULL,choices = c("Michoacán","Nuevo León"))   
+                                               )
+                                       )
+                               ),
+                               dropdownMenuOutput("notificaciones")
+      ),
       sidebar =  dashboardSidebar(
         sidebarMenu(
           menuItem("Encuestas", tabName = "encuestas",
                    icon = icon("th")),
           menuItem("Redes sociales", tabName = "red_social",
-                   icon = icon("th")),
+                   icon = icon("twitter-square")),
           menuItem("Noticias", tabName = "noticias",
                    icon = icon("newspaper")),
           menuItem("Análisis electoral", tabName = "a_electoral",
@@ -27,7 +36,6 @@ app_ui <- function(request) {
       body = dashboardBody(
         tabItems(
           tabItem(tabName = "encuestas",
-                  actionButton("actualizar","Actualizar"),
                   mod_encuestas_ui("encuestas_ui_1")
                   ),
           tabItem(tabName = "red_social",

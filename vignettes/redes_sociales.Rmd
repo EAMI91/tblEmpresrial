@@ -1,0 +1,211 @@
+---
+title: "redes_sociales"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{redes_sociales}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+
+
+library(magrittr)
+library(dplyr)
+library(lubridate)
+library(highcharter)
+library(quanteda)
+library(rtweet)
+library(ggplot2)
+library(quanteda.textplots)
+library(here)
+
+```
+
+
+```{r}
+proyectos <- tibble( grupo = sample(c("Tweet", "Menciones", "RT", "Likes"),
+                                    prob = c(.2,.2 ,.3, .3), size = 100, replace = T),
+                     fecha = sample(seq(today()-100, today(), length.out = 11), size = 100, replace = T )) %>%
+  arrange(fecha) %>% 
+  group_by(fecha, grupo) %>%
+  summarise(n=n()) 
+```
+
+```{r}
+
+
+reach <- function(bd){
+  hchart(bd, hcaes(x = fecha, y = n, group = grupo), type = "line") %>%
+    hc_plotOptions(line= list(lineWidth = 4,
+                              marker = list(radius =0),
+                              stickyTracking=F)) %>%
+    hc_xAxis(crosshair = T, title = list(text = "Fecha",  style = list(color = "#FFF")), type = "datetime",
+             lineWidth = 0, tickWidth  = 0, gridLineWidth =0,
+             showLastLabel= F,
+             labels = list(step = 3, style = list(fontSize = "16px", color = "#FFF") )) %>%
+    hc_yAxis(crosshair = F, title = list(text = "Total de proyectos", style = list(color = "#FFF")), tickAmount = 3, max = 10, min =0,
+             dashStyle = "dot",
+             gridLineWidth =.5, showFirstLabel = F, gridLineColor = "",
+             labels = list( style = list(fontSize = "12px") )) %>%
+    #title
+    hc_title(text = "<b>Proyectos de ley</b>",  style = list(color = "#FFF")) %>%
+    #tooltip
+    hc_tooltip(
+      borderWidth= 0,
+      outside = T,
+      textOutline= "3px contrast",
+      shadow=F,
+      shared = T,
+      split = F,
+      headerFormat= '<span style="font-size: 10px">{point.key}</span><br/>'
+      # pointFormat = '<span style="color:{point.color}">●</span> <b> {point.candidato}<b><br> p. clave: {point.palabra}<br> {point.n} tuits <br> {point.rt} retuits<br> {point.favs} favoritos<br>'
+    ) %>%
+ hc_add_theme(hc_theme_gridlight()) %>% 
+    hc_colors(colors = c("#2C6170", "#FF6B6B", "#FFE66D", "steelblue")) %>%
+    hc_chart(style = list(fontFamily = "Avenir next"
+    ))
+  
+}
+
+
+reach(proyectos)
+
+```
+
+```{r}
+
+
+bd <- tibble(votos = sample(30:78, size = 172, replace = T),
+             voto = sample(c("Negativo", "Positivo"), size = 172, replace = T, prob = c(.5, .5))) %>%
+  mutate(mes = cut(votos,c(17,29,39,49,59,69,79, 89,100),
+                   labels = c("Semana 1", "Semana 2", "Semana 3", "Semana 4", "Semana 5", "Semana 6", "Semana 7", "Semana 8"))) %>%
+  count(mes, voto) %>%
+  mutate(n = as.double(n),
+         n2= case_when(voto == "Negativo"~ n*-1,
+                       voto == "Positivo"~ n))
+
+graficando_saldo <- function(bd){
+  hchart(bd, hcaes(y = n2, group = voto, x = mes), type = "bar") %>%
+    hc_colors(colors = c("#f03b20", "#31a354")) %>%
+    hc_plotOptions(bar = list(stacking = T, borderRadius = 5,
+                              dataLabels= list(enabled =F,
+                                               align= "center",
+                                               inside= F,
+                                               # rotation = 5,
+                                               verticalAlign= 'top',
+                                               # x = -5,
+                                               crop= F,
+                                               overflow= "none",
+                                               style=list(color="BLACK", fontSize = "25px", textOutline= "3px contrast"),
+                                               format = paste0("{point.n:,.0f} ")
+                                               
+                              )
+    ))%>%
+    
+    hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }")))
+  
+}
+
+graficando_saldo(bd)
+
+```
+
+```{r}
+load(here("data", "candidatos.rda"))
+candidatos <- filter(candidatos, candidato=="Candidato 1")
+words <- select(candidatos, text)
+
+procesando_nube <- function(DB){
+DB$sentido = sample(c("Negativo", "Positivo"), 
+                       size = nrow(DB), replace = T, prob = c(.5, .5))
+corp_quanteda <- corpus(DB)
+Nube <- dfm(corp_quanteda, remove = stopwords("spanish"), 
+            remove_punct = TRUE, groups = "sentido")
+
+
+}
+
+graficando_nube <- function(DB){
+  nube <- textplot_wordcloud(Nube, comparison = TRUE, max_words = 300, adjust = 0, 
+                   rotation   = 0.1, random_order = FALSE,random_color = FALSE,
+                   ordered_color = FALSE,
+                   color = c("#cb2833", "#0f4c42")) + theme_minimal()
+  return(nube)
+}
+
+Nube <- procesando_nube(words)
+graficando_nube(Nube)
+
+
+```
+
+```{r}
+procesando_nube <- function(DB){
+DB$sentido = sample(c("Negativo", "Positivo"), 
+                       size = 3199, replace = T, prob = c(.5, .5))
+corp_quanteda <- corpus(DB)
+Nube <- dfm(corp_quanteda, remove = stopwords("spanish"), 
+            remove_punct = TRUE, groups = "sentido")
+
+
+}
+
+Nube <- procesando_nube(words)
+
+procesando_red_menciones <- function(DB){
+tag_dfm <- dfm_select(DB, pattern = ("@*"))
+toptag <- names(topfeatures(tag_dfm, 20))
+tag_fcm <- fcm(tag_dfm)
+topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+}
+
+red <- procesando_red_menciones(Nube)
+
+graficando_red <- function(DB){
+textplot_network(DB,
+                 min_freq = 0.1, edge_alpha = 0.8, 
+                 edge_size = 5)
+
+}
+
+graficando_red(red)
+
+
+```
+
+```{r}
+
+
+Nube <- procesando_nube(words)
+
+procesando_red_hashtag <- function(DB){
+tag_dfm <- dfm_select(DB, pattern = ("#*"))
+toptag <- names(topfeatures(tag_dfm, 20))
+tag_fcm <- fcm(tag_dfm)
+topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+}
+
+red <- procesando_red_hashtag(Nube)
+
+graficando_red <- function(DB){
+textplot_network(DB,
+                 min_freq = 0.1, edge_alpha = 0.8, 
+                 edge_size = 5)
+
+}
+
+graficando_red(red)
+
+
+
+
+```
+

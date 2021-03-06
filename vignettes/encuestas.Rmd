@@ -117,7 +117,7 @@ hPollofPolls <- function(DB, puntos, hoy, eleccion) {
 }
 hoy<- tibble(x= max(as.Date(puntos$fechaEncuesta)), y= 50) %>% mutate(tt = "Última<br> encuesta")
 eleccion<- tibble(x= as.Date("2021-06-06"), y= 50) %>% mutate(tt = "Día de la<br> elección")
-bd %>% hPollofPolls(puntos = puntos, hoy = hoy, eleccion = eleccion)
+bd_pop %>% hPollofPolls(puntos = puntos, hoy = hoy, eleccion = eleccion)
 ```
 
 
@@ -148,10 +148,17 @@ intVotoBarras <- function(bd){
                                  "INDEPENDIENTE 2" ="#2F9C37"))
 }
 
-tibble(partido = c("MORENA", "PAN", "PRI"),
-       n = c(.43, .28, .27)) %>% mutate(n2 = paste0(n*100, "%")) %>% 
+base1 <- tibble(partido = c("MORENA", "PAN", "PRI"),
+       n = c(.43, .28, .27), 
+       entidad="Michoacán") %>% mutate(n2 = paste0(n*100, "%")) 
+base2 <- tibble(partido = c("MORENA", "PAN", "PRI"),
+       n = c(.27, .28, .43), 
+       entidad="Nuevo León") %>% mutate(n2 = paste0(n*100, "%")) 
+  
+bd_barras  <- bind_rows(base1, base2) %>% 
+    filter(entidad=="Nuevo León") %>% 
   intVotoBarras()
-
+bd_barras
 ```
 
 
@@ -211,7 +218,7 @@ probGanarOld <- function(bd, candidato, nCand){
     )
   return(g)
 }
-tibble( y = c("1", "2", "3"),
+tabla1 <- tibble( y = c("1", "2", "3"),
         candidato = c("MORENA", "PAN", "PRI"),
         dia = rep(77, 3),
         color = c("#751438", "#17418A", "#EB0E0E"),
@@ -219,6 +226,34 @@ tibble( y = c("1", "2", "3"),
         fecha = rep(as.Date("2021-06-06"), 3),
         prob = c(43, 28, 27),
         label = c("43%", "28%", "27%"),
-        rw = c(1, 2, 3)) %>% 
+        rw = c(1, 2, 3), 
+        entidad= "Michoacán")
+tabla2 <- tibble( y = c("1", "2", "3"),
+        candidato = c("PRI", "PAN", "MORENA"),
+        dia = rep(77, 3),
+        color = c("#EB0E0E", "#17418A", "#751438"),
+        p = c(.43, .28, .27),
+        fecha = rep(as.Date("2021-06-06"), 3),
+        prob = c(43, 28, 27),
+        label = c("43%", "28%", "27%"),
+        rw = c(1, 2, 3), 
+        entidad= "Nuevo León")
+
+juntas <- bind_rows(tabla1, tabla2) %>% 
+          filter(entidad== !!entidad())%>% 
   probGanarOld(candidato = "MORENA", 5)
+```
+
+```{r include = T}
+
+  puntos_tempo <- puntos
+  puntos_tempo$entidad <- "Michoacán"
+  puntos_tempo2 <- puntos
+  puntos_tempo2$entidad <- "Nuevo León"
+  
+  puntos_tempo2 <- mutate(puntos_tempo2, 
+                      partido=if_else(partido=="MORENA", "PRI",
+                      if_else(partido=="PRI", "MORENA", partido)),
+                      candidato=if_else(candidato=="AMLO", "MEADE",
+                      if_else(candidato=="MEADE", "AMLO",candidato)))
 ```
