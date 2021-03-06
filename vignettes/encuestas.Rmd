@@ -1,3 +1,35 @@
+---
+title: "encuestas"
+output: rmarkdown::html_vignette
+vignette: >
+%\VignetteIndexEntry{encuestas}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  ---
+  
+  ```{r, include = FALSE}
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#>"
+)
+
+#Hacer 3 funciones de graficas 3 fake datas y en mod_fctgrafs las pongo
+
+```
+
+```{r setup}
+library(highcharter)
+library(tidyverse)
+library(magrittr)
+library(readr)
+library(ggchicklet)
+```
+
+```{r include = T}
+bd <- read_csv("bd_pollofpolls.csv")
+puntos <- read_csv("puntos_pollofpolls.csv")
+
+
 vSeries<-function(grupos){
   num <-seq_len(grupos)+1
   letra<- letters[num]
@@ -83,7 +115,13 @@ hPollofPolls <- function(DB, puntos, hoy, eleccion) {
   
   return(Graph)
 }
+hoy<- tibble(x= max(as.Date(puntos$fechaEncuesta)), y= 50) %>% mutate(tt = "Última<br> encuesta")
+eleccion<- tibble(x= as.Date("2021-06-06"), y= 50) %>% mutate(tt = "Día de la<br> elección")
+bd_pop %>% hPollofPolls(puntos = puntos, hoy = hoy, eleccion = eleccion)
+```
 
+
+```{r include = T}
 
 intVotoBarras <- function(bd){
   bd %>% 
@@ -110,6 +148,22 @@ intVotoBarras <- function(bd){
                                  "INDEPENDIENTE 2" ="#2F9C37"))
 }
 
+base1 <- tibble(partido = c("MORENA", "PAN", "PRI"),
+       n = c(.43, .28, .27), 
+       entidad="Michoacán") %>% mutate(n2 = paste0(n*100, "%")) 
+base2 <- tibble(partido = c("MORENA", "PAN", "PRI"),
+       n = c(.27, .28, .43), 
+       entidad="Nuevo León") %>% mutate(n2 = paste0(n*100, "%")) 
+  
+bd_barras  <- bind_rows(base1, base2) %>% 
+    filter(entidad=="Nuevo León") %>% 
+  intVotoBarras()
+bd_barras
+```
+
+
+
+```{r include = T}
 probGanarOld <- function(bd, candidato, nCand){
   
   pCand <- bd %>% 
@@ -125,13 +179,15 @@ probGanarOld <- function(bd, candidato, nCand){
   # browser()
   g <- ggplot(bd) +
     # Marcas
-    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=0, ymax=25), alpha = 0.05, fill = "#C5C3C4")+
-    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=25, ymax=50), alpha = 0.10, fill = "#C5C3C4")+
-    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=50, ymax=75), alpha = 0.15, fill = "#C5C3C4")+
-    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=75, ymax=100), alpha = 0.20, fill = "#C5C3C4")+
+    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=0, ymax=25), alpha = 0.05, fill = "#C5C3C4", lineend = "round", linejoin = "round")+
+    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=25, ymax=50), alpha = 0.10, fill = "#C5C3C4", lineend = "round", linejoin = "round")+
+    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=50, ymax=75), alpha = 0.15, fill = "#C5C3C4", lineend = "round", linejoin = "round")+
+    geom_rect(aes(xmin=0, xmax=nCand+1, ymin=75, ymax=100), alpha = 0.20, fill = "#C5C3C4",
+              lineend = "round", linejoin = "round")+
     # Indicadores
     geom_rect(aes(xmin=rw, xmax=rw+.8, ymin=0, ymax=prob, fill = candidato, color = color),
-              size=.3,color="white") +
+              size=.3,color="white",
+              lineend = "round", linejoin = "round") +
     coord_polar(theta = "y")+
     geom_text(aes(x=-nCand, y=0, label=scales::percent(pCand/100)), size=8) +
     scale_fill_manual(values = c("INDEPENDIENTE 1" = "#925AAD",
@@ -162,3 +218,42 @@ probGanarOld <- function(bd, candidato, nCand){
     )
   return(g)
 }
+tabla1 <- tibble( y = c("1", "2", "3"),
+        candidato = c("MORENA", "PAN", "PRI"),
+        dia = rep(77, 3),
+        color = c("#751438", "#17418A", "#EB0E0E"),
+        p = c(.43, .28, .27),
+        fecha = rep(as.Date("2021-06-06"), 3),
+        prob = c(43, 28, 27),
+        label = c("43%", "28%", "27%"),
+        rw = c(1, 2, 3), 
+        entidad= "Michoacán")
+tabla2 <- tibble( y = c("1", "2", "3"),
+        candidato = c("PRI", "PAN", "MORENA"),
+        dia = rep(77, 3),
+        color = c("#EB0E0E", "#17418A", "#751438"),
+        p = c(.43, .28, .27),
+        fecha = rep(as.Date("2021-06-06"), 3),
+        prob = c(43, 28, 27),
+        label = c("43%", "28%", "27%"),
+        rw = c(1, 2, 3), 
+        entidad= "Nuevo León")
+
+juntas <- bind_rows(tabla1, tabla2) %>% 
+          filter(entidad== !!entidad())%>% 
+  probGanarOld(candidato = "MORENA", 5)
+```
+
+```{r include = T}
+
+  puntos_tempo <- puntos
+  puntos_tempo$entidad <- "Michoacán"
+  puntos_tempo2 <- puntos
+  puntos_tempo2$entidad <- "Nuevo León"
+  
+  puntos_tempo2 <- mutate(puntos_tempo2, 
+                      partido=if_else(partido=="MORENA", "PRI",
+                      if_else(partido=="PRI", "MORENA", partido)),
+                      candidato=if_else(candidato=="AMLO", "MEADE",
+                      if_else(candidato=="MEADE", "AMLO",candidato)))
+```

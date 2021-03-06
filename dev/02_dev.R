@@ -31,6 +31,7 @@ usethis::use_package("plotly")
 usethis::use_package("tidyr")
 usethis::use_package("ggfittext")
 usethis::use_package("ggthemes")
+usethis::use_package("ggchicklet")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -51,7 +52,8 @@ golem::add_css_file( "custom" )
 
 ## Add internal datasets ----
 ## If you have data in your package
-usethis::use_data_raw( name = "my_dataset", open = FALSE ) 
+usethis::use_data_raw( name = "bd_pop") 
+usethis::use_data_raw(name = "puntos_pop")
 
 ## Tests ----
 ## Add one line by test you want to create
@@ -62,6 +64,8 @@ usethis::use_test( "app" )
 ## Vignette ----
 usethis::use_vignette("redes_sociales")
 usethis::use_vignette("noticias")
+usethis::use_vignette("tblEmpresrial")
+usethis::use_vignette("encuestas")
 devtools::build_vignettes()
 
 ## Code coverage ----

@@ -36,7 +36,6 @@ app_ui <- function(request) {
       body = dashboardBody(
         tabItems(
           tabItem(tabName = "encuestas",
-                  actionButton("actualizar","Actualizar"),
                   mod_encuestas_ui("encuestas_ui_1")
                   ),
           tabItem(tabName = "red_social",
