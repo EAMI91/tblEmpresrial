@@ -9,13 +9,12 @@ timeline_noticias <- function(bd){
   
   
   hc <- bd %>% 
-    hchart(
-      'spline', hcaes(x = fecha, y = Noticias, group = calificacion)
+    hchart( hcaes(x = fecha, y = Noticias, group = calificacion), type="line"
     )  %>%
     hc_colors(c("#BBC200", "#710627", "#CF8C40")) %>% 
-    hc_plotOptions(spline= list(lineWidth = 5,
-                                marker = list(radius =0),
-                                stickyTracking=F)) %>% 
+    hc_plotOptions(line= list(lineWidth = 4,
+                              marker = list(radius =0),
+                              stickyTracking=F)) %>% 
     hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
              lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
              showLastLabel= F,
@@ -180,34 +179,23 @@ temas_eleccion <- function(bd, pregunta, otro, x, titulo =""){
 barras_candidatos <- function(bd, candidatos, col, title){
   
   bd <- bd %>%
-    filter(candidato %in% candidatos)%>% 
     mutate(n  =  1) %>%
-    group_by({{ col }}, candidato) %>%
+    group_by(!!sym(col), candidato) %>%
     summarise(across(n, sum)) %>% 
     mutate(percentage =round(100*n/sum(n))) %>% 
     mutate(label = paste(round(percentage, 1), "%", sep = " "))
   
-  Graph <- ggplot(bd, aes(x = {{ col }}, y = percentage,
-                          fill = as.factor(candidato), label = label)) +
-    ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
-                              radius = grid::unit(5, "pt"), width = .9, alpha =.85)+
-    # geom_col(width = 0.9, position = position_dodge(0.95)) + 
-    geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", vjust = 1, color = "#FFFFFF") +
-    # geom_text( hjust = 1.3, color = "#FFFFFF", size = 8, position = ggplot2::position_dodge())+
-    theme_hc() + scale_fill_calc() + 
-    labs(title = as.character(title), caption = "", x = "", y = "") +
-    theme(
-      axis.ticks.y=element_blank(), 
-      axis.title.y = element_blank(),
-      axis.title.x = element_text(color = "#8b878d"),
-      text = element_text(family = "Avenir Next", size = 12),
-      plot.title = element_text(size = 15,
-                                colour =  "#13384D",
-                                hjust = 0, face = "bold"),
-      axis.text.y = element_blank(),
-      axis.text.x = element_text(family = "Avenir Next", size = 12),
-      legend.title=element_blank()
-    )
+  Graph <- hchart(bd, hcaes(x = !!sym(col), y = percentage, group = candidato), 
+                  type = "bar") %>%
+    hc_title(text = as.character(title)) %>% 
+    hc_xAxis(title = "") %>% 
+    hc_colors(c("#174a80", "#00A896",
+                "#0f4c42", "#cb2833"))%>%
+    hc_chart(style = list(fontFamily = "Avenir next"
+    ))
+  
+  
+  
   
   return(Graph)
 }

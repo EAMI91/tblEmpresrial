@@ -39,6 +39,7 @@ app_server <- function( input, output, session ) {
     req(input$entidad)
     input$entidad
   })
+  
   # Módulo de candidatos
   callModule(mod_candidatos_server, "candidatos_ui_1", entidad = entidad)  
   
@@ -50,7 +51,7 @@ app_server <- function( input, output, session ) {
   callModule(mod_redes_sociales_server, "redes_sociales_ui_1", entidad = entidad)
   
   #Módulo de noticias
-  callModule(mod_noticias_server, "noticias_ui_1")
+  callModule(mod_noticias_server, "noticias_ui_1", entidad = entidad)
   
   #Análisis
   

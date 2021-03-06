@@ -21,6 +21,7 @@ usethis::use_package("shinycssloaders")
 usethis::use_package("highcharter")
 usethis::use_package("ggplot2")
 usethis::use_package("tibble")
+<<<<<<< HEAD
 usethis::use_package("slickR")
 usethis::use_package("quanteda")
 usethis::use_package("plotly")
@@ -39,6 +40,19 @@ usethis::use_package("quanteda.textplots")
 usethis::use_package("here")
 usethis::use_package("shinymanager")
 
+=======
+usethis::use_package("magrittr")
+usethis::use_package("lubridate")
+usethis::use_package("rtweet")
+usethis::use_package("quanteda.textplots")
+usethis::use_package("here")
+usethis::use_package("quanteda")
+usethis::use_package("plotly")
+usethis::use_package("tidyr")
+usethis::use_package("ggfittext")
+usethis::use_package("ggthemes")
+usethis::use_package("ggchicklet")
+>>>>>>> encuestas
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -73,11 +87,18 @@ usethis::use_test( "app" )
 # Documentation
 
 ## Vignette ----
+<<<<<<< HEAD
 usethis::use_vignette("noticias")
 usethis::use_vignette("tblEmpresrial")
 usethis::use_vignette("encuestas")
 usethis::use_vignette("redes_sociales")
 
+=======
+usethis::use_vignette("redes_sociales")
+usethis::use_vignette("noticias")
+usethis::use_vignette("tblEmpresrial")
+usethis::use_vignette("encuestas")
+>>>>>>> encuestas
 devtools::build_vignettes()
 
 ## Code coverage ----
