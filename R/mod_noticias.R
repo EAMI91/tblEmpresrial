@@ -26,16 +26,16 @@ mod_noticias_ui <- function(id){
              shinycssloaders::withSpinner(highchartOutput(ns("temasEleccion")))
       ),
       column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(plotOutput(ns("tipoEventos")))
+             shinycssloaders::withSpinner(highchartOutput(ns("tipoEventos")))
       ), 
       column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(plotOutput(ns("percepcionMedios")))
+             shinycssloaders::withSpinner(highchartOutput(ns("percepcionMedios")))
       ),
       column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(plotOutput(ns("mencionGenerada")))
+             shinycssloaders::withSpinner(highchartOutput(ns("mencionGenerada")))
       ),
       column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(plotOutput(ns("mencionNoGenerada")))
+             shinycssloaders::withSpinner(highchartOutput(ns("mencionNoGenerada")))
       ),
       column(width = 6, class="shadowBox",
              shinycssloaders::withSpinner(plotOutput(ns("califGenerada")))
@@ -50,7 +50,7 @@ mod_noticias_ui <- function(id){
 #' noticias Server Function
 #'
 #' @noRd 
-mod_noticias_server <- function(input, output, session){
+mod_noticias_server <- function(input, output, session, entidad){
   ns <- session$ns
   
   bd <- reactive({
@@ -70,9 +70,13 @@ mod_noticias_server <- function(input, output, session){
     id = 1:n, title = v, calificacion = X,
     fecha = as.Date(rep(x, len = n)),
     text = rep(text, len = n),               
-    temas = sample(c("Deportes", "Cultura", "Sociedad", "Tecnología", "Otros"), n, replace=T)) %>% 
+    temas = sample(c("Deportes", "Cultura", "Sociedad", "Tecnología", "Otros"), n, replace=T),
+    entidad = sample(c("Michoacán", "Nuevo León"), 
+                     n, replace = T, 
+                     prob = c(.5, .5))
+    ) %>% 
     mutate(temasOtro = case_when(temas == "Otros" ~ "Otro tema"), Noticias = 1)
-    BD
+    BD <- filter(BD, entidad==!!entidad())
   })
   
   bd_2 <- reactive({
@@ -85,8 +89,12 @@ mod_noticias_server <- function(input, output, session){
     mencionGenerada = sample(c("Boletines\n de prensa", "declaraciones", "filtraciones"), n, replace = T),
     mencionNoGenerada = sample(c("personaje", "columnista", "adversario", "partidario"), n, replace = T),
     calif_generada = sample(c("Mala", "Buena", "Regular"), n, replace = T),
-    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T)
+    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T), 
+    entidad = sample(c("Michoacán", "Nuevo León"), 
+                     n, replace = T, 
+                     prob = c(.5, .5))
     )
+    BD <- filter(BD, entidad==!!entidad())
     })
   
   output$timeNoticias <- renderHighchart({
@@ -98,8 +106,8 @@ mod_noticias_server <- function(input, output, session){
   })
   
   output$nubePalabras <- renderPlot({
-    Nube <- procesando_nube(bd(), 10)
-    graficando_nube(Nube, 10)
+    Nube <- procesando_nube_not(bd(), 10)
+    graficando_nube_not(Nube, 10)
   })
   
   output$termometro <- renderPlotly({
@@ -114,25 +122,25 @@ mod_noticias_server <- function(input, output, session){
                    titulo = "Temas de la elección general")
   })
   
-  output$tipoEventos <- renderPlot({
+  output$tipoEventos <- renderHighchart({
     barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      tipoEvento, "Tipos de enventos")
+                      col="tipoEvento", "Tipos de enventos")
     })
   
-  output$percepcionMedios <- renderPlot({
+  output$percepcionMedios <- renderHighchart({
     
     barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      percepcion, "Percepción en Medios")
+                      col="percepcion", "Percepción en Medios")
     })
   
-  output$mencionGenerada <- renderPlot({
+  output$mencionGenerada <- renderHighchart({
     barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      mencionGenerada, "Menciones del candidato generadas")
+                      col="mencionGenerada", "Menciones del candidato generadas")
   })
   
-  output$mencionNoGenerada <- renderPlot({
+  output$mencionNoGenerada <- renderHighchart({
     barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      mencionNoGenerada, "Menciones del candidato no generadas")
+                      col="mencionNoGenerada", "Menciones del candidato no generadas")
       })
   
   output$califGenerada <- renderPlot({
