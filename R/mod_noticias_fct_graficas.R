@@ -269,3 +269,66 @@ barras_calificada <- function(bd, cand, col, calif, title){
   
   return(Graph)
 }
+
+treemap_calificacion <- function(BD, candida){    
+  base1 <- BD %>% 
+    filter(candidato %in% candida)%>% 
+    select(mencionGenerada) %>% 
+    unique() %>% 
+    mutate(color=if_else(mencionGenerada=="Boletines\n de prensa", "#FFFFFF", 
+                         if_else(mencionGenerada=="declaraciones","#FFFFFF","#FFFFFF")),
+           id = str_to_id(mencionGenerada)
+    )%>%
+    rename("name"="mencionGenerada")
+  base2 <- BD %>% 
+    filter(candidato %in% candida)%>% 
+    count(percepcion, mencionGenerada) %>% 
+    mutate(color=if_else(percepcion=="Buena",
+                         "#0f4c42",                     
+                         if_else(percepcion=="Mala",
+                                 "#cb2833","#808080")),
+           parent=str_to_id(mencionGenerada),
+           id = as.character(row_number())) %>% 
+    rename("name"= "percepcion", "value"="n")
+  dde <- list(base1, base2) %>%
+    purrr::map(mutate_if, is.factor, as.character) %>% 
+    bind_rows() %>% 
+    list_parse() %>% 
+    purrr::map(function(x) x[!is.na(x)])
+  
+  gra <- highchart() %>% 
+    hc_chart(type = "treemap") %>% 
+    hc_title(
+      text = paste0("Calificación de menciones ", candida)
+    ) %>% 
+    hc_add_series(
+      data = dde,
+      allowDrillToNode = TRUE,
+      levelIsConstant = TRUE,
+      textOverflow = "clip",
+      dataLabels = list(color = "white"),
+      levels = list(
+        list(
+          level = 1,
+          borderWidth = 8,
+          dataLabels = list(
+            enabled = TRUE,
+            verticalAlign = "top",
+            align = "left",
+            style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        ),
+        list(
+          level = 2,
+          borderWidth = 0,
+          dataLabels = list(enabled = FALSE)
+        )
+      )
+    ) %>% 
+    hc_colors("trasnparent") %>% 
+    hc_chart(style = list(fontFamily = "Avenir next"
+    ))
+  
+  
+  return(gra)
+}

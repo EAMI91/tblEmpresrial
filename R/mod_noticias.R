@@ -38,10 +38,16 @@ mod_noticias_ui <- function(id){
              shinycssloaders::withSpinner(highchartOutput(ns("mencionNoGenerada")))
       ),
       column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(plotOutput(ns("califGenerada")))
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada1")))
       ),
       column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(plotOutput(ns("califNoGenerada")))
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada2")))
+      ), 
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada3")))
+      ),
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada4")))
       )
     )
   )
@@ -143,15 +149,19 @@ mod_noticias_server <- function(input, output, session, entidad){
                       col="mencionNoGenerada", "Menciones del candidato no generadas")
       })
   
-  output$califGenerada <- renderPlot({
-    barras_calificada(bd_2(), cand = "candidato 1", mencionGenerada,
-                      calif_generada, "Calificación de menciones generadas de")
+  output$califGenerada1 <- renderHighchart({
+    treemap_calificacion(bd_2(), candida="candidato 1")
   })
   
-  output$califNoGenerada <- renderPlot({
-    
-    barras_calificada(bd_2(), cand = "candidato 2", mencionNoGenerada,
-                      calif_no_generada, "Calificación de menciones generadas de")
+  output$califGenerada2 <- renderHighchart({
+    treemap_calificacion(bd_2(), candida="candidato 2")
+  })
+  output$califGenerada3 <- renderHighchart({
+    treemap_calificacion(bd_2(), candida="candidato 3")
+  })
+  
+  output$califGenerada4 <- renderHighchart({
+    treemap_calificacion(bd_2(), candida="candidato 4")
   })
 }
  
