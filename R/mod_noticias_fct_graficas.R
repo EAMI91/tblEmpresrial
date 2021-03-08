@@ -332,3 +332,86 @@ treemap_calificacion <- function(BD, candida){
   
   return(gra)
 }
+
+treemap_calificacion_bis <- function(BD, candida){
+  base1 <- BD %>% 
+    filter(candidato %in% candida)%>%
+    select(percepcion) %>% 
+    unique() %>% 
+    mutate(color=if_else(percepcion=="Buena",
+                         "#FFFFFF",                     
+                         if_else(percepcion=="Mala",
+                                 "#FFFFFF","#FFFFFF")),
+           id=str_to_id(percepcion)) %>% 
+    rename("name"="percepcion")
+  base2 <- BD %>% 
+    filter(candidato %in% candida)%>%
+    count(percepcion, mencionGenerada) %>% 
+    mutate(color=if_else(percepcion=="Buena" & 
+                  mencionGenerada=="Boletines\n de prensa","#006d2c",
+                  if_else(percepcion=="Buena" & 
+                  mencionGenerada=="declaraciones",
+                  "#31a354",
+                  if_else(percepcion=="Buena" & 
+                  mencionGenerada=="filtraciones",
+                  "#74c476",
+                  if_else(percepcion=="Mala" & 
+                  mencionGenerada=="Boletines\n de prensa",
+                  "#a50f15",
+                  if_else(percepcion=="Mala" & 
+                  mencionGenerada=="declaraciones",
+                  "#de2d26",
+                  if_else(percepcion=="Mala" & 
+                  mencionGenerada=="filtraciones",
+                  "#fb6a4a", 
+                  if_else(percepcion=="Regular" & 
+                  mencionGenerada=="Boletines\n de prensa",
+                  "#636363",
+                  if_else(percepcion=="Regular" & 
+                  mencionGenerada=="declaraciones",
+                  "#969696","#cccccc")))))))),
+           parent=str_to_id(percepcion),
+           id = as.character(row_number())) %>% 
+    rename("name"= "mencionGenerada", "value"="n")
+  dde <- list(base1, base2) %>%
+    purrr::map(mutate_if, is.factor, as.character) %>% 
+    bind_rows() %>% 
+    list_parse() %>% 
+    purrr::map(function(x) x[!is.na(x)])
+  
+  grafi <-  highchart() %>% 
+    hc_chart(type = "treemap") %>% 
+    hc_title(
+      text = paste0("Calificación de menciones ", candida)
+    ) %>%
+    hc_add_series(
+      data = dde,
+      allowDrillToNode = TRUE,
+      levelIsConstant = TRUE,
+      textOverflow = "clip",
+      dataLabels = list(color = "white"),
+      levels = list(
+        list(
+          level = 1,
+          borderWidth = 8,
+          dataLabels = list(
+            enabled = TRUE,
+            verticalAlign = "top",
+            align = "left",
+            style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        ),
+        list(
+          level = 2,
+          borderWidth = 0,
+          dataLabels = list(enabled = FALSE)
+        )
+      )
+    ) %>% 
+    # esto es para que el primer nivel, que no tiene color asigando, 
+    # sea transparente.
+    hc_colors("trasnparent")
+  
+  
+  return(grafi)
+}
