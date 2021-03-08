@@ -404,9 +404,15 @@ treemap_calificacion_bis <- function(BD, candida){
         list(
           level = 2,
           borderWidth = 0,
-          dataLabels = list(enabled = FALSE)
+          dataLabels = list(
+            enabled = TRUE, 
+            verticalAlign = "bottom",
+            align = "left",
+            style = list(fontSize = "12px", textOutline = FALSE)
+            
+          )
         )
-      )
+        )
     ) %>% 
     # esto es para que el primer nivel, que no tiene color asigando, 
     # sea transparente.
