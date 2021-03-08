@@ -150,18 +150,18 @@ mod_noticias_server <- function(input, output, session, entidad){
       })
   
   output$califGenerada1 <- renderHighchart({
-    treemap_calificacion(bd_2(), candida="candidato 1")
+    treemap_calificacion_bis(bd_2(), candida="candidato 1")
   })
   
   output$califGenerada2 <- renderHighchart({
-    treemap_calificacion(bd_2(), candida="candidato 2")
+    treemap_calificacion_bis(bd_2(), candida="candidato 2")
   })
   output$califGenerada3 <- renderHighchart({
-    treemap_calificacion(bd_2(), candida="candidato 3")
+    treemap_calificacion_bis(bd_2(), candida="candidato 3")
   })
   
   output$califGenerada4 <- renderHighchart({
-    treemap_calificacion(bd_2(), candida="candidato 4")
+    treemap_calificacion_bis(bd_2(), candida="candidato 4")
   })
 }
  
