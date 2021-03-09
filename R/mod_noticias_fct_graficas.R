@@ -61,40 +61,91 @@ graficando_nube_not <- function(db, z){
   return(nube)
 }
 
-termometro_electoral <- function(){
-  termometro <- plot_ly(
-    type = "indicator",
-    mode = "gauge+number",
-    value = 70,
-    title = list(text = "Termómetro electoral estatal", font = list(size = 20), color = "#13384D"),
-    gauge = list(
-      axis = list(range = list(NULL, 100), tickwidth = 1, tickcolor = "#13384D" ),
-      bar = list(color = "#FFFFFF", width = 0.4, thickness = 0.08),
-      bgcolor = "white",
-      borderwidth = 2.5,
-      bordercolor = "white",
-      steps = list(
-        list(range = c(0, 20), color = "#710627"),
-        list(range = c(20, 40), color = "#DB3D35"),
-        list(range = c(40, 60), color = "#E08931"),
-        list(range = c(60, 80), color = "#C2BF15"),
-        list(range = c(80, 100), color = "#89A100")
+termo <- function(nivel){
+  termom <-  highchart() %>% 
+    hc_chart(
+      type = "gauge",
+      plotBackgroundColor = NULL,
+      plotBackgroundImage = NULL,
+      plotBorderWidth = 0,
+      plotShadow = FALSE
+    ) %>% 
+    hc_title(
+      text = "Termómetro electoral estatal"
+    ) %>% 
+    hc_pane(
+      startAngle = -150,
+      endAngle = 150,
+      background = list(list(
+        backgroundColor = list(
+          linearGradient = list( x1 = 0, y1 = 0, x2 = 0, y2 = 1),
+          stops = list(
+            list(0, "#FFF"),
+            list(1, "#333")
+          )
+        ),
+        borderWidth = 0,
+        outerRadius = "109%"
+      ), list(
+        backgroundColor = list(
+          linearGradient = list( x1 = 0, y1 = 0, x2 = 0, y2 = 1),
+          stops = list(
+            list(0, "#333"),
+            list(1, "#FFF")
+          )
+        ),
+        borderWidth = 1,
+        outerRadius = "107%"
+      ), list(
+        # default background
+      ), list(
+        backgroundColor = "#DDD",
+        borderWidth = 0,
+        outerRadius = "105%",
+        innerRadius = "103%"
+      ))
+    ) %>% 
+    hc_add_series(
+      data = nivel, name = "nivel", tooltip = list(valueSuffix = " ")
+    ) %>% 
+    hc_chart(style = list(fontFamily = "Avenir next"
+    )) %>% 
+    
+    hc_yAxis(
+      min = 0,
+      max = 100,
+      
+      minorTickInterval = "auto",
+      minorTickWidth = 1,
+      minorTickLength = 10,
+      minorTickPosition = "inside",
+      minorTickColor = "#666",
+      
+      tickPixelInterval = 30,
+      tickWidth = 2,
+      tickPosition = "inside",
+      tickLength = 10,
+      tickColor = "#666",
+      
+      labels = list(
+        step = 2,
+        rotation = "auto"
       ),
-      threshold = list(
-        line = list(color = "#13384D", width = 4),
-        thickness = 1.0,
-        value = 70))
-  ) 
+      title = list(
+        text = ""
+      ),
+      
+      plotBands = list(
+        list(from =   0, to = 25, color = "#55BF3B"),
+        list(from = 25, to = 50, color = "#DDDF0D"),
+        list(from = 50, to = 75, color = "#FFA500"),
+        list(from = 75, to = 100, color = "#DF5353")
+      )
+      
+    )
   
-  termometro <- termometro %>%
-    layout(
-      margin = list(l=15,r=30),
-      paper_bgcolor = "white",
-      font = list(color = "#13384D", family = "Avenir Next"))
-  
-  return(termometro)
+  return(termom)
 }
-
 temas_eleccion <- function(bd, pregunta, otro, x, titulo =""){
   bd_2 <- bd %>% filter({{ pregunta }} %in% c('Otro'))
   
@@ -404,13 +455,21 @@ treemap_calificacion_bis <- function(BD, candida){
         list(
           level = 2,
           borderWidth = 0,
-          dataLabels = list(enabled = FALSE)
+          dataLabels = list(
+            enabled = TRUE, 
+            verticalAlign = "bottom",
+            align = "left",
+            style = list(fontSize = "12px", textOutline = FALSE)
+            
+          )
         )
-      )
+        )
     ) %>% 
     # esto es para que el primer nivel, que no tiene color asigando, 
     # sea transparente.
-    hc_colors("trasnparent")
+    hc_colors("trasnparent") %>% 
+    hc_chart(style = list(fontFamily = "Avenir next"
+    ))
   
   
   return(grafi)
