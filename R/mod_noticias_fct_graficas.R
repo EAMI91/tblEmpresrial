@@ -73,6 +73,7 @@ termo <- function(nivel){
     hc_title(
       text = "Termómetro electoral estatal"
     ) %>% 
+    hc_add_theme(hc_theme_google()) %>% 
     hc_pane(
       startAngle = -150,
       endAngle = 150,
@@ -194,6 +195,7 @@ temas_eleccion <- function(bd, pregunta, otro, x, titulo =""){
                  fontFamily = "Avenir Next",
                  # color = "#0c5776",
                  fontSize = "16px"))) %>% 
+      hc_add_theme(hc_theme_google()) %>% 
       hc_colors("#4F5F80") %>% 
       hc_tooltip(headerFormat = "",
                  pointFormat= '<b>{point.y}%</b>',
@@ -218,6 +220,7 @@ temas_eleccion <- function(bd, pregunta, otro, x, titulo =""){
                labels = list(  format=paste0("{value}%"))) %>% 
       hc_xAxis(title = list(enabled = F), labels = list(style = list(color = "#0c5776", fontFamily  = "Avenir Next", fontSize = "18px"))) %>% 
       hc_colors("#81cbfe")%>% 
+      hc_add_theme(hc_theme_google()) %>% 
       hc_tooltip(headerFormat = "",
                  pointFormat= '<b>{point.y}%</b>',
                  borderWidth= 0, shape = "square", shadow=F)
@@ -238,6 +241,7 @@ barras_candidatos <- function(bd, candidatos, col, title){
   
   Graph <- hchart(bd, hcaes(x = !!sym(col), y = percentage, group = candidato), 
                   type = "bar") %>%
+    hc_add_theme(hc_theme_google()) %>% 
     hc_title(text = as.character(title)) %>% 
     hc_xAxis(title = "") %>% 
     hc_colors(c("#174a80", "#00A896",
@@ -435,6 +439,7 @@ treemap_calificacion_bis <- function(BD, candida){
     hc_title(
       text = paste0("Calificación de menciones ", candida)
     ) %>%
+    hc_add_theme(hc_theme_google()) %>% 
     hc_add_series(
       data = dde,
       allowDrillToNode = TRUE,
