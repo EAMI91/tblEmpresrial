@@ -20,7 +20,7 @@ mod_noticias_ui <- function(id){
              shinycssloaders::withSpinner(plotOutput(ns("nubePalabras")))
         ),
       column(width =  6, class="shadowBox",
-             shinycssloaders::withSpinner(plotlyOutput(ns("termometro")))
+             shinycssloaders::withSpinner(highchartOutput(ns("termometro")))
         ),
       column(width = 12, class="shadowBox",
              shinycssloaders::withSpinner(highchartOutput(ns("temasEleccion")))
@@ -103,6 +103,14 @@ mod_noticias_server <- function(input, output, session, entidad){
     BD <- filter(BD, entidad==!!entidad())
     })
   
+  nivel <- reactive({
+    base_termo <- tibble(
+      entidad = sample(c("Michoacán", "Nuevo León"), 2, replace = F),
+      num=sample(1:100, 2))
+    base_termo <- filter(base_termo, entidad==!!entidad())
+    base_termo$num
+    })
+  
   output$timeNoticias <- renderHighchart({
     E <- bd() %>% 
       group_by(calificacion, fecha) %>% 
@@ -116,8 +124,8 @@ mod_noticias_server <- function(input, output, session, entidad){
     graficando_nube_not(Nube, 10)
   })
   
-  output$termometro <- renderPlotly({
-  termometro_electoral()
+  output$termometro <- renderHighchart({
+    termo(nivel())
   })
  
   output$temasEleccion <- renderHighchart({
