@@ -1,18 +1,24 @@
-﻿Entidad,Candidato,Partido,Fecha de nacimiento,Lugar de nacimiento,Estudios,Perfil político,Cargo actual,Perfil de twitter oficial,Perfil de facebook oficial,Foto formal,Foto semiformal,Foto casual
-Michoacán,Cristóbal Arias Solís,FSM,10/08/54,Michoacán,Licenciatura en Derecho por la Universidad Michoacana de San Nicolás de Hidalgo.,Texto de prueba para el tablero de empresas,Senador de la República (2018-2021),https://twitter.com/CristobalAriaSo?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/SenCristobalArias/,CAS_F.jpg,CAS_SF.jpg,CAS_C.jpg
+﻿Entidad,Candidato,Partido,Fecha de nacimiento,Lugar de nacimiento,Estudios,Perfil político,Cargo actual,Perfil de twitter oficial,Perfil de facebook oficial,Foto formal,Foto semiformal,Foto casual,foto_perfil
+Michoacán,Cristóbal Arias Solís,FSM,10/08/54,Michoacán,Licenciatura en Derecho por la Universidad Michoacana de San Nicolás de Hidalgo.,Texto de prueba para el tablero de empresas,Senador de la República (2018-2021),https://twitter.com/CristobalAriaSo?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/SenCristobalArias/,CAS_F.jpg,CAS_SF.jpg,CAS_C.jpg,CAS_P.png
 Michoacán,Raúl Morón Orozco,MORENA,25/10/58,Michoacán,"Licenciatura en Matemáticas por la Escuela Normal Superior de Morelos.
-Licenciatura en Educación Física por la Escuela Normal Superior de Morelos .",Texto de prueba para el tablero de empresas,Presidente municipal de Morelia (2018-2021),https://twitter.com/raulmoronO?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/raulmoronorozco/,RMO_F.jpg,RMO_SF.jpg,RMO_C.jpg
+Licenciatura en Educación Física por la Escuela Normal Superior de Morelos .",Texto de prueba para el tablero de empresas,Presidente municipal de Morelia (2018-2021),https://twitter.com/raulmoronO?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/raulmoronorozco/,RMO_F.jpg,RMO_SF.jpg,RMO_C.jpg,RMO_P.png
 Querétaro,Mauricio Kuri,PAN,09/05/69,Veracruz,"Licenciatura en Derecho por la Universidad del Valle de México.
 Diplomados en finanzas en la Universidad Anahuác.
-",Texto de prueba para el tablero de empresas,Senador de la República (2018-2024),https://twitter.com/makugo,https://www.facebook.com/MauricioKuriGonzalez,MKG_F.jpg,MKG_SF.png,MKG_C.jpg
+",Texto de prueba para el tablero de empresas,Senador de la República (2018-2024),https://twitter.com/makugo,https://www.facebook.com/MauricioKuriGonzalez,MKG_F.jpg,MKG_SF.png,MKG_C.jpg,
 Querétaro,Celia Maya,MORENA,04/12/49,Querétaro,"Licenciatura en Derecho por la Universidad Autónoma de Querétaro. 
 Contadora Pública por la Universidad Autónoma de Querétaro.
 Maestría Fiscal por la Universidad Autónoma de Querétaro. 
-Doctorado en Derecho por la Universidad Autónoma de Querétaro ",Texto de prueba para el tablero de empresas,Candidata  de Morena a gubernatura de Querétaro,https://twitter.com/CeliaMayaGar?s=20,https://www.facebook.com/CeliaMayaGar/,CM_F.jpg,CM_SF.png,CM_C.jpg
+Doctorado en Derecho por la Universidad Autónoma de Querétaro ",Texto de prueba para el tablero de empresas,Candidata  de Morena a gubernatura de Querétaro,https://twitter.com/CeliaMayaGar?s=20,https://www.facebook.com/CeliaMayaGar/,CM_F.jpg,CM_SF.png,CM_C.jpg,
 Nuevo León,Adrián de la Garza,PRI,17/09/71,Nuevo León,"Licenciado en Derecho Y Ciencias Sociales de la UANL
 
 Maestría en Ciencias Penales de la UANL.
 
-Diplomado en Juicios Orales, Diplomado en Desarrollo y Administración de Sistemas de Inteligencia y Estrategia por la Escuela de Graduados en Administración Pública del Tecnológico de Monterrey.",Texto de prueba para el tablero de empresas,Alcalde de Monterrey (2018-2021),https://twitter.com/AdrianDeLaGarza?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/pg/AdrianDeLaGarzaS/about/?ref=page_internal,AEG_F.jpg,AEG_SF.jpg,AEG_C.jpg
+Diplomado en Juicios Orales, Diplomado en Desarrollo y Administración de Sistemas de Inteligencia y Estrategia por la Escuela de Graduados en Administración Pública del Tecnológico de Monterrey.",Texto de prueba para el tablero de empresas,Alcalde de Monterrey (2018-2021),https://twitter.com/AdrianDeLaGarza?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/pg/AdrianDeLaGarzaS/about/?ref=page_internal,AEG_F.jpg,AEG_SF.jpg,AEG_C.jpg,AGS_P.png
 Nuevo León,Clara Luz Flores,MORENA,27/01/74,Nuevo León,"Licenciada en Ciencias Jurídicas por la Universidad Regiomontana.
-Maestra en Derecho Administrativo por la Universidad de Zaragoza en España.",Texto de prueba para el tablero de empresas,Presidenta Municipal de General Escobedo (2018-2021),https://twitter.com/claraluzflores?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/ClaraLuzFlores/,CLF_F.jpg,CLF_SF.jpg,CLF_C.jpg
+Maestra en Derecho Administrativo por la Universidad de Zaragoza en España.",Texto de prueba para el tablero de empresas,Presidenta Municipal de General Escobedo (2018-2021),https://twitter.com/claraluzflores?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor,https://www.facebook.com/ClaraLuzFlores/,CLF_F.jpg,CLF_SF.jpg,CLF_C.jpg,CLF_p.png
+Michoacán,,,,,,,,,,,,,AAS_P.png
+Michoacán,,,,,,,,,,,,,CHT_P.png
+Michoacán,,,,,,,,,,,,,JAM_P.png
+Michoacán,,,,,,,,,,,,,RSF_P.png
+Nuevo León,,,,,,,,,,,,,FAL_P.png
+Nuevo León,,,,,,,,,,,,,SAS_p.png
