@@ -23,8 +23,8 @@ app_server <- function( input, output, session ) {
   callModule(mod_redes_sociales_server, "redes_sociales_ui_1")
   
   #Módulo de noticias
-  callModule(mod_noticias_server, "noticias_ui_1", entidad = entidad)
-  
+  callModule(mod_noticias_general_server, "noticias_general_ui_1", entidad = entidad)
+
   #Módulo de análisis electoral cualitativo
   callModule(mod_a_electoral_server, "a_electoral_ui_1")
 }
