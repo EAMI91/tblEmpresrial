@@ -11,11 +11,16 @@ app_server <- function( input, output, session ) {
     tibble(a = sample(1:5,5), b = sample(6:10,5))
   })
   
+  
+  entidad <- reactive({
+    req(input$entidad)
+    input$entidad
+  })
   # Módulo de encuestas
   callModule(mod_encuestas_server, "encuestas_ui_1", bd = bd)  
   
   # Módulo de redes sociales
-  callModule(mod_redes_sociales_server, "redes_sociales_ui_1")
+  callModule(mod_redes_general_server, "redes_general_ui_1", entidad=entidad)
   
   #Módulo de noticias
   callModule(mod_noticias_server, "noticias_ui_1")

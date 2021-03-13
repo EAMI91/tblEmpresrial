@@ -27,6 +27,7 @@ usethis::use_package("quanteda")
 usethis::use_package("rtweet")
 usethis::use_package("quanteda.textplots")
 usethis::use_package("here")
+usethis::use_package("purrr")
 
 
 ## Add modules ----
@@ -35,6 +36,9 @@ golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
 golem::add_module( name = "redes_sociales", fct = "graficas" ) # Name of the module
 golem::add_module( name = "noticias", fct = "graficas" )
 golem::add_module( name = "a_electoral", fct = "graficas" )
+golem::add_module( name = "red_profundo", fct = "graficas" )
+golem::add_module( name = "redes_general")
+
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 

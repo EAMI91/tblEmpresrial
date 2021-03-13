@@ -10,7 +10,16 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # List the first level UI elements here 
     dashboardPage(
-      header = dashboardHeader(title = "Tablero empresarial"),
+      header = dashboardHeader(title = "Tablero empresarial",
+                               tags$li(class = "dropdown",
+                                       tags$li(class = "dropdown",
+                                               div(
+                                                 selectInput("entidad",label = NULL,choices = c("Michoacán","Nuevo León"))   
+                                               )
+                                       )
+                               ),
+                               dropdownMenuOutput("notificaciones")
+      ),
       sidebar =  dashboardSidebar(
         sidebarMenu(
           menuItem("Encuestas", tabName = "encuestas",
@@ -31,7 +40,7 @@ app_ui <- function(request) {
                   mod_encuestas_ui("encuestas_ui_1")
                   ),
           tabItem(tabName = "red_social",
-                  mod_redes_sociales_ui("redes_sociales_ui_1")
+                  mod_redes_general_ui("redes_general_ui_1")
                   ),
           tabItem(tabName = "noticias",
                   mod_noticias_ui("noticias_ui_1")
@@ -64,7 +73,10 @@ golem_add_external_resources <- function(){
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'tblEmpresrial'
-    )
+    ), 
+    # includeCSS(path = here::here("www/tweets.css")),
+    tags$link(href="https://fonts.googleapis.com/css?family=Muli:400,600,700&display=swap", rel = "stylesheet"),
+    tags$script(async = TRUE, src = "https://platform.twitter.com/widgets.js")
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
   )
