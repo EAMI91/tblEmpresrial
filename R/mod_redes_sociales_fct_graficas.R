@@ -96,29 +96,16 @@ graficando_nube <- function(DB){
 }
 
 
-### Redes-----
 
-procesando_red_menciones <- function(DB){
-  tag_dfm <- dfm_select(DB, pattern = ("@*"))
-  toptag <- names(topfeatures(tag_dfm, 20))
-  tag_fcm <- fcm(tag_dfm)
-  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+
+blockquote <- function(TW_Entities, TW_StatusID, null_on_error = F){
+  oembed_url <- glue::glue("https://publish.twitter.com/oembed?url=https://twitter.com/{TW_Entities}/status/{TW_StatusID}&omit_script=1&dnt=1&theme=light&lang=es")
+  bq <- purrr::possibly(httr::GET, list(status_code = 999))(URLencode(oembed_url))
+  if (bq$status_code >= 400) {
+    if (null_on_error) return(NULL)
+    glue('<blockquote style="font-size: 90%">Lo sentimos, no fue posible mostrar el tuit de {TW_Entities}¯\\_(ツ)_/¯</blockquote>')
+  } else {
+    httr::content(bq, "parsed")$html
+  }
 }
-
-graficando_red <- function(DB){
-  textplot_network(DB,
-                   min_freq = 0.1, edge_alpha = 0.5, 
-                   edge_size = 5)
-  
-}
-
-
-procesando_red_hashtag <- function(DB){
-  tag_dfm <- dfm_select(DB, pattern = ("#*"))
-  toptag <- names(topfeatures(tag_dfm, 20))
-  tag_fcm <- fcm(tag_dfm)
-  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
-}
-
-
 

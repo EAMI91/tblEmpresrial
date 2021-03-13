@@ -46,6 +46,10 @@ golem::add_module( name = "redes_sociales", fct = "graficas" ) # Name of the mod
 golem::add_module( name = "noticias", fct = "graficas" )
 golem::add_module( name = "candidatos")
 golem::add_module( name = "análisis")
+golem::add_module( name = "a_electoral", fct = "graficas" )
+golem::add_module( name = "red_profundo", fct = "graficas" )
+golem::add_module( name = "redes_general")
+
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 

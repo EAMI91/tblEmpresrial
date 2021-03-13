@@ -12,7 +12,7 @@ mod_redes_sociales_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(width = 6, 
+      column(width = 12, 
              selectInput(ns("candidato"), label = "Selecciones candidato", choices = c("Candidato 1", "Candidato 2", "Candidato 3"), selected = "Candidato 1")
       ) 
       
@@ -26,30 +26,34 @@ mod_redes_sociales_ui <- function(id){
     ), 
     
     fluidRow(
-      column(width = 6, class="shadowBox",
+      column(width = 6, 
+             tags$h4(HTML( "Comparativo")),
+             class="shadowBox",
              shinycssloaders::withSpinner(
                highchartOutput(ns("saldo"))
              )
       ), 
-      column(width = 6, class="shadowBox",
+      column(width = 6, 
+             tags$h4(HTML( "Contenido de comentarios")),
+             class="shadowBox",
              shinycssloaders::withSpinner(
                plotOutput(ns("nube"))
              ))    
       
+      
     ), 
     fluidRow(
-      column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(
-             plotOutput(ns("mencion"))
-             )
+      column(width = 6, 
+             tags$h4(HTML( "Tweet con más interacciones")),
+             shinycssloaders::withSpinner(uiOutput(ns("masFavs")), 
+                                          proxy.height = "200px")
       ), 
-      column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(
-               plotOutput(ns("hashtag"))
-             ))    
-      
+      column(width = 6, 
+             tags$h4(HTML( "Tweet con mayor alcance")),
+             shinycssloaders::withSpinner(uiOutput(ns("masmencion")), 
+                                          proxy.height = "200px")
+      )    
     )
-    
   )
 }
 
@@ -83,10 +87,11 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
                                        size = 100, replace = T, 
                                        prob = c(.5, .5)),
                       candidato = "Candidato 3")
+    
     proyectos <- bind_rows(tempo1, tempo2)
     
     proyectos <- bind_rows(proyectos, tempo3) %>% 
-      filter(entidad==!! entidad()) %>% 
+      filter(entidad==!!entidad()) %>% 
       filter(candidato==!!input$candidato) %>% 
       arrange(fecha) %>% 
       group_by(fecha, grupo) %>%
@@ -147,17 +152,38 @@ mod_redes_sociales_server <- function(input, output, session, entidad){
     graficando_nube(nube())
   })
   
-  output$mencion <- renderPlot({
-    red_menciones <- procesando_red_menciones(nube())
-    graficando_red(red_menciones)
+  
+  
+  
+  output$masFavs <- renderUI({
+    tagList(
+      paratuit %>% 
+        filter(entidad==!!entidad()) %>% 
+        filter(candidato==!!input$candidato) %>% 
+        select(TW_Entities,TW_StatusID) %>% 
+        blockquote(TW_Entities = .$TW_Entities,TW_StatusID = .$TW_StatusID) %>% 
+        HTML(),
+      tags$script('twttr.widgets.load(document.getElementById("tweet"));')
+    )
+    
   })
   
-  output$hashtag <- renderPlot({
-    red_hashtag <- procesando_red_hashtag(nube())
-    graficando_red(red_hashtag)
+  output$masmencion <- renderUI({
+    tagList(
+      menciones_1 %>% 
+        filter(entidad==!!entidad()) %>% 
+        filter(candidato==!!input$candidato) %>% 
+        select(TW_Entities,TW_StatusID) %>% 
+        blockquote(TW_Entities = .$TW_Entities,TW_StatusID = .$TW_StatusID) %>% 
+        HTML(),
+      tags$script('twttr.widgets.load(document.getElementById("tweet"));')
+    )
+    
   })
   
 }
+
+
 
 ## To be copied in the UI
 # mod_redes_sociales_ui("redes_sociales_ui_1")
