@@ -25,18 +25,7 @@ mod_noticias_ui <- function(id){
       column(width = 12, class="shadowBox",
              shinycssloaders::withSpinner(highchartOutput(ns("temasEleccion")))
       ),
-      column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(highchartOutput(ns("tipoEventos")))
-      ), 
-      column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(highchartOutput(ns("percepcionMedios")))
-      ),
-      column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(highchartOutput(ns("mencionGenerada")))
-      ),
-      column(width = 6, class="shadowBox",
-             shinycssloaders::withSpinner(highchartOutput(ns("mencionNoGenerada")))
-      ),
+      
       column(width = 6, class="shadowBox",
              shinycssloaders::withSpinner(highchartOutput(ns("califGenerada1")))
       ),
@@ -136,27 +125,7 @@ mod_noticias_server <- function(input, output, session, entidad){
                    titulo = "Temas de la elección general")
   })
   
-  output$tipoEventos <- renderHighchart({
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="tipoEvento", "Tipos de enventos")
-    })
-  
-  output$percepcionMedios <- renderHighchart({
-    
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="percepcion", "Percepción en Medios")
-    })
-  
-  output$mencionGenerada <- renderHighchart({
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="mencionGenerada", "Menciones del candidato generadas")
-  })
-  
-  output$mencionNoGenerada <- renderHighchart({
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="mencionNoGenerada", "Menciones del candidato no generadas")
-      })
-  
+
   output$califGenerada1 <- renderHighchart({
     treemap_calificacion_bis(bd_2(), candida="candidato 1")
   })

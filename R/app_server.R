@@ -51,10 +51,10 @@ app_server <- function( input, output, session ) {
   callModule(mod_redes_general_server, "redes_general_ui_1", entidad=entidad)
   
   #Módulo de noticias
-  callModule(mod_noticias_server, "noticias_ui_1", entidad = entidad)
-  
-  #Análisis
-  
+
+  callModule(mod_noticias_general_server, "noticias_general_ui_1", entidad = entidad)
+
+  #Módulo de análisis electoral cualitativo
   callModule(mod_análisis_server, "análisis_ui_1",tipo = "encuestas", entidad = entidad)
   callModule(mod_análisis_server, "análisis_ui_2",tipo = "redes", entidad = entidad)
   callModule(mod_análisis_server, "análisis_ui_3",tipo = "noticias", entidad = entidad)

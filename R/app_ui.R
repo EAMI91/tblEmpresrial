@@ -60,7 +60,7 @@ app_ui <- function(request) {
                   mod_análisis_ui("análisis_ui_2")
           ),
           tabItem(tabName = "noticias",
-                  mod_noticias_ui("noticias_ui_1")
+                  mod_noticias_general_ui("noticias_general_ui_1")
           ),
           tabItem(tabName = "not_pdf",
                   mod_análisis_ui("análisis_ui_3")
