@@ -43,7 +43,7 @@ app_ui <- function(request) {
                   mod_redes_sociales_ui("redes_sociales_ui_1")
                   ),
           tabItem(tabName = "noticias",
-                  mod_noticias_ui("noticias_ui_1")
+                  mod_noticias_general_ui("noticias_general_ui_1")
           ),
           tabItem(tabName = "a_electoral",
                   mod_a_electoral_ui("a_electoral_ui_1")
