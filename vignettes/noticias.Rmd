@@ -33,47 +33,57 @@ library(ggchicklet)
 ```
 
 ```{r}
-n <- 1000
-v <- rep("Este es un texto a ser noticia", n)
+noticias <- noticias_prueba %>% 
+                  mutate(fecha=floor_date(fecha,unit = "day"), 
+                         fecha=as.Date(fecha)) %>% 
+                  filter(!is.na(calificacion)) %>% 
+                  count(fecha, calificacion)
 
-A <- tibble(id = 1:n,
-            title = v) 
+  noticias %>% hchart(hcaes(x = fecha, y = n, group = calificacion), type="line"
+  )  %>%
+  hc_colors(c("#710627", "#CF8C40", "#BBC200")) %>% 
+  hc_plotOptions(line= list(lineWidth = 4,
+                              marker = list(radius =5),
+                              stickyTracking=F)) %>% 
+  hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
+           lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
+           showLastLabel= F,
+           labels = list(step = 2, style = list(fontSize = "16px", color = "#001c44") )) %>%
+  hc_yAxis(crosshair = F, title = list(text = "Número de Noticias"), tickAmount = 3, 
+           gridLineWidth =.5, showFirstLabel = F,
+           labels = list( style = list(fontSize = "12px") )) %>%
+  #title
+  hc_title(text = "<b>Calificación de Noticias</b>",
+           align = "left", style = list(fontSize = "22px", color = "#13384D")) %>% 
+  hc_tooltip(
+          sort = F,
+          shared = T,
+          borderWidth= 0,
+          split = T,
+          pointFormat = "<br> <b>Calificación</b>: {series.name} <br> <p><b> Número de noticias</b>: {point.Noticias} </p>",
+          headerFormat = '<span style="font-size: 15px">{point.key}</span><br/>',
+          style = list(fontSize = "16px", color = "#41657A"),
+          useHTML = F) %>% 
+  hc_chart(style = list(fontFamily = "Avenir Next"), backgroundColor = "#FFF")
 
-X <- sample(c("Buena", "Mala", "Regular"),prob = c(.2,.2 ,.6), n, replace=T) 
-
-B <- tibble(id = 1:n, calificacion = X)
-
-C <- A %>% left_join(B) 
-
-x <- c("12/01/2020", "13/01/2020","14/01/2020", "15/01/2020", "16/01/2020", "17/01/2020",
-       "12/02/2020", "13/02/2020","14/02/2020", "15/02/2020", "16/02/2020", "17/02/2020",
-       "12/01/2021", "13/01/2021","14/01/2021", "15/01/2021", "16/01/2021", "17/01/2021",
-       "12/02/2021", "13/02/2021","14/02/2021", "15/02/2021", "16/02/2021", "17/02/2021")
-fechas <- tibble(id = 1:n, fecha =lubridate::dmy(rep(x, len = n)))                 
-
-D <- C %>% left_join(fechas) %>% mutate(Noticias = 1)
-
-E <- D %>% 
-  group_by(calificacion, fecha) %>% 
-  summarise(across(Noticias, sum))
 
 # Timeline
 timeline_noticias <- function(bd){
   # Funciones para volver al español
-  hcoptslang <- getOption("highcharter.lang")
-  hcoptslang$weekdays<- c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
-  hcoptslang$shortMonths <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
-  hcoptslang$months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
-  hcoptslang$thousandsSep <- c(",")
-  options(highcharter.lang = hcoptslang)
+  # hcoptslang <- getOption("highcharter.lang")
+  # hcoptslang$weekdays<- c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
+  # hcoptslang$shortMonths <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+  # hcoptslang$months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+  # hcoptslang$thousandsSep <- c(",")
+  # options(highcharter.lang = hcoptslang)
   
   
 hc <- bd %>% 
-  hchart(hcaes(x = fecha, y = Noticias, group = calificacion), type="line"
+  hchart(hcaes(x = fecha, y = n, group = calificacion), type="line"
   )  %>%
   hc_colors(c("#710627", "#CF8C40", "#BBC200")) %>% 
   hc_plotOptions(line= list(lineWidth = 4,
-                              marker = list(radius =0),
+                              marker = list(radius =5),
                               stickyTracking=F)) %>% 
   hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
            lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
@@ -97,6 +107,7 @@ hc <- bd %>%
   hc_chart(style = list(fontFamily = "Avenir Next"), backgroundColor = "#FFF")
   return(hc)
 }
+timeline_noticias(noticias)
 ```
 # Timeline
 ```{r}
@@ -104,13 +115,16 @@ E %>%  mutate(calificacion = factor(calificacion, c("Mala", "Regular", "Buena"))
 ```
 
 ```{r}
-filePath <- "http://www.sthda.com/sthda/RDoc/example-files/martin-luther-king-i-have-a-dream-speech.txt"
-text <- readLines(filePath) 
-remove <- c("", " ")
-text <- setdiff(text, remove)
-desc <- tibble(id = 1:n, text = rep(text, len = n))               
-G <- left_join(D, desc)
-
+noticias <- noticias_prueba %>% 
+            filter(!is.na(calificacion)) %>% 
+            filter(estado!="Nuevo León")
+  words <- select(noticias, texto, calificacion) 
+  titulo <- "Temas electoraes"
+  #corp_tm <- tm::VCorpus(tm::VectorSource(words))
+  corp_quanteda <- corpus(words,text_field = "texto")
+  Nube <- dfm(corp_quanteda, remove = stopwords("english"),
+              remove_punct = TRUE, groups = "calificacion")
+  
 procesando_nube <- function(bd, z){
   words <- select(bd, text, calificacion) %>% na.omit() 
   titulo <- "Temas electoraes"
@@ -136,6 +150,8 @@ graficando_nube <- function(db, z){
   
   return(nube)
 }
+
+graficando_nube_not(Nube,5)
 ```
 # Nube de palabras de noticias
 ```{r}

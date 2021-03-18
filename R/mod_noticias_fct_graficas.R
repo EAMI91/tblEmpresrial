@@ -1,19 +1,19 @@
 timeline_noticias <- function(bd){
   # Funciones para volver al español
-  hcoptslang <- getOption("highcharter.lang")
-  hcoptslang$weekdays<- c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
-  hcoptslang$shortMonths <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
-  hcoptslang$months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
-  hcoptslang$thousandsSep <- c(",")
-  options(highcharter.lang = hcoptslang)
+  # hcoptslang <- getOption("highcharter.lang")
+  # hcoptslang$weekdays<- c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
+  # hcoptslang$shortMonths <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+  # hcoptslang$months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+  # hcoptslang$thousandsSep <- c(",")
+  # options(highcharter.lang = hcoptslang)
   
   
   hc <- bd %>% 
-    hchart( hcaes(x = fecha, y = Noticias, group = calificacion), type="line"
+    hchart( hcaes(x = fecha, y = n, group = calificacion), type="line"
     )  %>%
     hc_colors(c("#BBC200", "#710627", "#CF8C40")) %>% 
     hc_plotOptions(line= list(lineWidth = 4,
-                              marker = list(radius =0),
+                              marker = list(radius =5),
                               stickyTracking=F)) %>% 
     hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
              lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
@@ -38,13 +38,14 @@ timeline_noticias <- function(bd){
   return(hc)
 }
 
-procesando_nube_not <- function(bd, z){
-  words <- select(bd, text, calificacion) %>% na.omit() 
+procesando_nube_not <- function(bd){
+  
+  words <- select(bd, texto, calificacion) 
   titulo <- "Temas electoraes"
-  corp_quanteda <- corpus(words)
+  #corp_tm <- tm::VCorpus(tm::VectorSource(words))
+  corp_quanteda <- corpus(words,text_field = "texto")
   Nube <- dfm(corp_quanteda, remove = stopwords("english"),
-              remove_punct = TRUE, groups = "calificacion")%>%
-    dfm_trim(min_termfreq = z)
+              remove_punct = TRUE, groups = "calificacion")
   return(Nube)
 }
 

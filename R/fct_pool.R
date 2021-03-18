@@ -14,3 +14,5 @@ onStop(function() {
 entidadesbd <- "p_suscriptoresIII"
 pruebabd <- "tw_pruebaIII"
 entrenamientobd <- "tw_entrenamientoIII"
+noticiasbd <- "p_entrenamientoIII"
+opcionesbd <- "p_opcionesIII"

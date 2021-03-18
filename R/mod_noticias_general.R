@@ -25,11 +25,11 @@ mod_noticias_general_ui <- function(id){
 #' noticias_general Server Function
 #'
 #' @noRd 
-mod_noticias_general_server <- function(input, output, session, entidad){
+mod_noticias_general_server <- function(input, output, session, df2){
   ns <- session$ns
   
-  callModule(mod_noticias_server, "noticias_ui_1", entidad=entidad)
-  callModule(mod_noticias_barras_server, "noticias_barras_ui_1", entidad=entidad)
+  callModule(mod_noticias_server, "noticias_ui_1", df2)
+  callModule(mod_noticias_barras_server, "noticias_barras_ui_1")
  
 }
     

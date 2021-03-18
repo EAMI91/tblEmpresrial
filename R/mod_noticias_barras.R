@@ -31,7 +31,7 @@ mod_noticias_barras_ui <- function(id){
 #' noticias_barras Server Function
 #'
 #' @noRd 
-mod_noticias_barras_server <- function(input, output, session, entidad){
+mod_noticias_barras_server <- function(input, output, session){
   ns <- session$ns
   
   
