@@ -31,6 +31,9 @@ usethis::use_package("plotly")
 usethis::use_package("tidyr")
 usethis::use_package("ggfittext")
 usethis::use_package("ggthemes")
+usethis::use_package("purrr")
+usethis::use_package("pool")
+
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -40,10 +43,13 @@ golem::add_module( name = "noticias", fct = "graficas" )
 golem::add_module( name = "a_electoral", fct = "graficas" )
 golem::add_module( name = "noticias_barras", fct = "graficas" )
 golem::add_module( name = "noticias_general")
+golem::add_module( name = "red_profundo", fct = "graficas" )
+golem::add_module( name = "redes_general")
 
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 
+golem::add_fct("pool") 
 golem::add_utils( "helpers" )
 
 ## External resources

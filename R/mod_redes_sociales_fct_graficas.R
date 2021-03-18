@@ -9,42 +9,52 @@
 reach <- function(bd){
   hchart(bd, hcaes(x = fecha, y = n, group = grupo), type = "line") %>%
     hc_plotOptions(line= list(lineWidth = 4,
-                              marker = list(radius =0),
+                              marker = list(radius =6),
                               stickyTracking=F)) %>%
-    hc_xAxis(crosshair = T, title = list(text = "Fecha",  style = list(color = "#FFF")), type = "datetime",
+    hc_xAxis(crosshair = T, title = list(text = F), type = "datetime",
              lineWidth = 0, tickWidth  = 0, gridLineWidth =0,
-             showLastLabel= F,
-             labels = list(step = 3, style = list(fontSize = "16px", color = "#FFF") )) %>%
-    hc_yAxis(crosshair = F, title = list(text = "Total", style = list(color = "#FFF")), tickAmount = 3, max = 10, min =0,
-             dashStyle = "dot",
-             gridLineWidth =.5, showFirstLabel = F, gridLineColor = "",
-             labels = list( style = list(fontSize = "12px") )) %>%
+             showLastLabel= T,
+             labels = list(format = '{value:%b %d}', step = 1, 
+                           style = list(fontSize = "18px",
+                                        color = "#13384D"))) %>%
+    hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }"))) %>% 
+    #title
+    hc_colors(colors = c("#2C6170", "#FF6B6B", "#FFE66D")) %>%
     #tooltip
-    hc_tooltip(
-      borderWidth= 0,
-      outside = T,
-      textOutline= "3px contrast",
-      shadow=F,
-      shared = T,
-      split = F,
-      headerFormat= '<span style="font-size: 10px">{point.key}</span><br/>'
-      # pointFormat = '<span style="color:{point.color}">●</span> <b> {point.candidato}<b><br> p. clave: {point.palabra}<br> {point.n} tuits <br> {point.rt} retuits<br> {point.favs} favoritos<br>'
-    ) %>%
-    hc_colors(colors = c("#2C6170", "#FF6B6B", "#FFE66D", "steelblue"))  %>% 
-    hc_chart(style = list(fontFamily = "Avenir next"
-    ))%>%
+    # hc_tooltip(
+    #   borderWidth= 0,
+    #   outside = T,
+    #   textOutline= "3px contrast",
+    #   shadow=F,
+    #   shared = T,
+    #   split = F,
+    #   headerFormat= '<span style="font-size: 10px">{point.key}</span><br/>'
+    # ) %>%
+    
+  hc_chart(style = list(fontFamily = "Avenir next"
+  ))%>%
     hc_add_theme(hc_theme_google())%>%
     #title
-    hc_title(text = "Alcance en redes sociales",  style = list(fontWeight = "bold", fontSize = "15px")) 
+    hc_title(text = "Alcance en redes sociales",  style = list(fontWeight = "bold", fontSize = "15px"))
   
 }
 
 
  #reach(proyectos)
 
+
+
+
 graficando_saldo <- function(df){
-  hchart(df, hcaes(y = n2, group = voto, x = mes), type = "bar") %>%
-    hc_colors(colors = c("#f03b20", "#31a354")) %>%
+  hchart(df, hcaes(x = fecha,y = n, group = calificacion), type = "column", stacking = "normal") %>%
+    hc_colors(colors = c("#f03b20",  "grey", "#31a354")) %>%
+    hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }"))) %>%
+    hc_xAxis(crosshair = T, title = list(text = F), type = "datetime",
+             lineWidth = 0, tickWidth  = 0, gridLineWidth =0,
+             showLastLabel= T,
+             labels = list(format = '{value:%b %d}', step = 1, 
+                           style = list(fontSize = "18px",
+                                        color = "#13384D"))) %>%
     hc_plotOptions(bar = list(stacking = T, borderRadius = 5,
                               dataLabels= list(enabled =F,
                                                align= "center",
@@ -60,11 +70,9 @@ graficando_saldo <- function(df){
                               )
     ))%>%
     
-    hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }"))) %>%
     hc_add_theme(hc_theme_google())%>%
     #title
     hc_title(text = "Balance de comentarios",  style = list(fontWeight = "bold", fontSize = "15px")) 
-  
 }
 
 
@@ -78,11 +86,9 @@ graficando_saldo <- function(df){
 
 
 procesando_nube <- function(DB){
-DB$sentido = sample(c("Negativo", "Positivo"), 
-                       size = nrow(DB), replace = T, prob = c(.5, .5))
-corp_quanteda <- corpus(DB)
-dfm(corp_quanteda, remove = stopwords("spanish"), 
-            remove_punct = TRUE, groups = "sentido")
+  corp_quanteda <- corpus(DB, text_field = "TW_Text")
+  Nube <- dfm(corp_quanteda, remove = stopwords("spanish"), 
+              remove_punct = TRUE, groups = "calificacion")
 
 }
 
@@ -97,29 +103,16 @@ graficando_nube <- function(DB){
 }
 
 
-### Redes-----
 
-procesando_red_menciones <- function(DB){
-  tag_dfm <- dfm_select(DB, pattern = ("@*"))
-  toptag <- names(topfeatures(tag_dfm, 20))
-  tag_fcm <- fcm(tag_dfm)
-  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+
+blockquote <- function(TW_Entities, TW_StatusID, null_on_error = F){
+  oembed_url <- glue::glue("https://publish.twitter.com/oembed?url=https://twitter.com/{TW_Entities}/status/{TW_StatusID}&omit_script=1&dnt=1&theme=light&lang=es")
+  bq <- purrr::possibly(httr::GET, list(status_code = 999))(URLencode(oembed_url))
+  if (bq$status_code >= 400) {
+    if (null_on_error) return(NULL)
+    glue('<blockquote style="font-size: 90%">Lo sentimos, no fue posible mostrar el tuit de {TW_Entities}¯\\_(ツ)_/¯</blockquote>')
+  } else {
+    httr::content(bq, "parsed")$html
+  }
 }
-
-graficando_red <- function(DB){
-  textplot_network(DB,
-                   min_freq = 0.1, edge_alpha = 0.5, 
-                   edge_size = 5)
-  
-}
-
-
-procesando_red_hashtag <- function(DB){
-  tag_dfm <- dfm_select(DB, pattern = ("#*"))
-  toptag <- names(topfeatures(tag_dfm, 20))
-  tag_fcm <- fcm(tag_dfm)
-  topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
-}
-
-
 

@@ -9,18 +9,67 @@ app_server <- function( input, output, session ) {
   
   bd <- eventReactive(input$actualizar,{
     tibble(a = sample(1:5,5), b = sample(6:10,5))
+    
+
+  })
+  
+
+  # entidad <- reactive({
+  #   req(input$entidad)
+  #   input$entidad
+  # })
+
+  df2 <- reactiveValues(entrenamiento = NULL, prueba = NULL)
+  df3 <- reactiveValues(entidadesb=NULL)
+  
+  
+  
+  observe({ df3$entidadesb=tbl(pool, entidadesbd) %>% 
+    collect()
+  })
+ 
+  
+  observeEvent(df3$entidadesb, {
+    entidades <- df3$entidadesb %>% pull(estado) 
+    updateSelectizeInput(session,
+                         'entidad',
+                         choices = entidades,
+                         selected = entidades,
+                         server = TRUE)
   })
   
   
-  entidad <- reactive({
-    input$entidad
+   observeEvent(input$entidad, {
+      df2$entrenamiento = tbl(pool, entrenamientobd) %>% 
+        filter(estado %in% !!req(input$entidad))%>% 
+        collect()
+      df2$prueba =tbl(pool, pruebabd) %>% collect() 
+      
   })
+  
+
+  
+  
+  
+  # 
+  # df2 <- reactiveValues(
+  #   entrenamiento = tbl(pool, entrenamientobd) %>% 
+  #     filter(estado %in% !!req(input$entidad))%>% 
+  #     collect(),
+  #   prueba =tbl(pool, pruebabd) %>% collect() 
+  # )
+  
+
+  
+  
+
+  
   
   # Módulo de encuestas
   callModule(mod_encuestas_server, "encuestas_ui_1", bd = bd)  
   
   # Módulo de redes sociales
-  callModule(mod_redes_sociales_server, "redes_sociales_ui_1")
+  callModule(mod_redes_general_server, "redes_general_ui_1",  df2=df2)
   
   #Módulo de noticias
   callModule(mod_noticias_general_server, "noticias_general_ui_1", entidad = entidad)
