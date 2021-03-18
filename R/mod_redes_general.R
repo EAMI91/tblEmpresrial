@@ -13,9 +13,6 @@ mod_redes_general_ui <- function(id){
     navbarPage(title = "Redes sociales",
                tabPanel("Alcance y mediciones",
                         mod_redes_sociales_ui(ns("redes_sociales_ui_1"))
-               ),
-               tabPanel("Interacciones",
-                        mod_red_profundo_ui(ns("red_profundo_ui_1"))
                )
   )
   )
@@ -24,11 +21,11 @@ mod_redes_general_ui <- function(id){
 #' redes_general Server Function
 #'
 #' @noRd 
-mod_redes_general_server <- function(input, output, session, entidad){
+mod_redes_general_server <- function(input, output, session,  df2){
   ns <- session$ns
   
-  callModule(mod_red_profundo_server, "red_profundo_ui_1", entidad = entidad)
-  callModule(mod_redes_sociales_server, "redes_sociales_ui_1", entidad = entidad)
+  callModule(mod_red_profundo_server, "red_profundo_ui_1")
+  callModule(mod_redes_sociales_server, "redes_sociales_ui_1", df2)
  
 }
 

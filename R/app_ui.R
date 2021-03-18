@@ -14,7 +14,7 @@ app_ui <- function(request) {
                                tags$li(class = "dropdown",
                                        tags$li(class = "dropdown",
                                                div(
-                                                 selectInput("entidad",label = NULL,choices = c("Michoacán","Nuevo León"))   
+                                                 selectInput("entidad",label = NULL,choices = NULL, selected = NULL)   
                                                )
                                        )
                                ),

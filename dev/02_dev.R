@@ -28,6 +28,7 @@ usethis::use_package("rtweet")
 usethis::use_package("quanteda.textplots")
 usethis::use_package("here")
 usethis::use_package("purrr")
+usethis::use_package("pool")
 
 
 ## Add modules ----
@@ -42,6 +43,7 @@ golem::add_module( name = "redes_general")
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 
+golem::add_fct("pool") 
 golem::add_utils( "helpers" )
 
 ## External resources
