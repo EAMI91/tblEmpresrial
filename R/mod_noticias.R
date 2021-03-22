@@ -101,6 +101,7 @@ mod_noticias_server <- function(input, output, session, df2){
     })
   
   output$timeNoticias <- renderHighchart({
+    paleta <- c("Negativa"="#710627", "Neutral"="#CF8C40", "Positiva"="#BBC200")
     noticias <- df2$noticias %>% 
       
       mutate(fecha=floor_date(fecha,unit = "day"), 
@@ -119,7 +120,10 @@ mod_noticias_server <- function(input, output, session, df2){
   })
   
   output$termometro <- renderHighchart({
-    termo(nivel())
+    paratermo <- df2$noticias %>% 
+             mutate(nivel=nrow(.)*20)
+    paratermo <- paratermo$nivel
+    termo(paratermo)
   })
  
   output$temasEleccion <- renderHighchart({

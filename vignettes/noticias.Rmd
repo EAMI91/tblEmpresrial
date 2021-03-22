@@ -201,6 +201,7 @@ termometro_electoral()
 ```
 
 ```{r}
+n <- 1000
 a <- tibble( id = 1:n,
   temas = sample(c("Deportes", "Cultura", "Sociedad", "Tecnología", "Otros"), n, replace=T))
 a <- mutate(a, temasOtro = case_when(temas == "Otros" ~ "Otro tema"))

@@ -31,8 +31,46 @@ mod_noticias_barras_ui <- function(id){
 #' noticias_barras Server Function
 #'
 #' @noRd 
-mod_noticias_barras_server <- function(input, output, session){
+mod_noticias_barras_server <- function(input, output, session, df2){
   ns <- session$ns
+  
+  
+
+  bd.cand <- reactiveVal(NULL)
+  bd.tema <- reactiveVal(NULL)
+  
+  observeEvent(df2$opciones, 
+    {   
+    bd.cand(
+    df2$opciones %>% select(idCategoria, variable, categoria) %>%
+      pivot_wider(names_from = variable, values_from = categoria) %>% 
+      mutate(Candidato = idCandidato, idCandidato = idCategoria) %>%
+      select(idCandidato, Candidato) %>% 
+      filter(!is.na(Candidato))
+  )
+    
+    bd.tema(
+      df2$opciones %>% select(idCategoria, variable, categoria) %>%
+        pivot_wider(names_from = variable, values_from = categoria) %>% 
+        mutate(Tema_1 = idTema, idTema_1 = idCategoria,
+               Tema_2 = Tema_1, idTema_2 = idTema_1,
+               Tema_3 = Tema_2, idTema_3 = idTema_2) %>%
+        select(idTema_1, Tema_1,idTema_2, Tema_2, idTema_3, Tema_3) %>% 
+        filter(!is.na(Tema_1))
+    )})
+
+  
+ # %>% 
+ #    left_join(bd.tema() %>% select(contains("Tema_1")), by = "idTema_1") %>% 
+ #    left_join(bd.tema() %>% select(contains("Tema_2")), by = "idTema_2") %>% 
+ #    left_join(bd.tema() %>% select(contains("Tema_3")), by = "idTema_3") 
+  
+  
+  
+  
+  
+  
+  
   
   
   bd_2 <- reactive({
@@ -54,24 +92,35 @@ mod_noticias_barras_server <- function(input, output, session){
   })
   
   output$tipoEventos <- renderHighchart({
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="tipoEvento", "Tipos de enventos")
+    barra<-   df2$noticias %>% 
+      left_join(bd.cand(), by = "idCandidato")
+    
+      barras_candidatos(barra, col="evento", title="Tipo de evento")
+    
+
   })
   
   output$percepcionMedios <- renderHighchart({
+    barra2<-   df2$noticias %>% 
+      left_join(bd.cand(), by = "idCandidato")
     
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="percepcion", "Percepción en Medios")
+    barras_candidatos(barra2, col="calificacion", title="Percepción en medios")
   })
   
   output$mencionGenerada <- renderHighchart({
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="mencionGenerada", "Menciones del candidato generadas")
+    barra3<-   df2$noticias %>% 
+      left_join(bd.cand(), by = "idCandidato") %>% 
+      filter(nota!="Nota no generada")
+    barras_candidatos(barra3, col="tipoMedio", "Menciones del candidato generadas")
   })
   
   output$mencionNoGenerada <- renderHighchart({
-    barras_candidatos(bd_2(), c("candidato 1", "candidato 2", "candidato 3"),
-                      col="mencionNoGenerada", "Menciones del candidato no generadas")
+    
+    barra4<-   df2$noticias %>% 
+      left_join(bd.cand(), by = "idCandidato") %>% 
+      filter(nota=="Nota no generada")
+    
+    barras_candidatos(barra4, col="tipoMedio",  "Menciones del candidato no generadas")
   })
 }
     

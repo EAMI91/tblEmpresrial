@@ -48,7 +48,8 @@ app_server <- function( input, output, session ) {
         filter(estado %in% !!req(input$entidad))%>% 
         collect() 
       
-      df2$opciones = tbl(pool, opcionesbd) %>% collect()
+      df2$opciones = tbl(pool, opcionesbd) %>%
+        collect()
       
       
   })
