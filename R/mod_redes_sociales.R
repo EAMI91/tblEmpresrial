@@ -13,7 +13,7 @@ mod_redes_sociales_ui <- function(id){
   tagList(
     fluidRow(
    column(width = 12, 
-             selectInput(ns("candidato"), label = "Selecciones candidato", choices = c("Candidato 1", "Candidato 2", "Candidato 3"), selected = "Candidato 1")
+             selectInput(ns("candidato"), label = "Selecciones candidato", choices = c("Cargando..."=""))
       ) 
 
     ),
@@ -57,12 +57,17 @@ mod_redes_sociales_ui <- function(id){
 #' redes_sociales Server Function
 #'
 #' @noRd 
-mod_redes_sociales_server <- function(input, output, session, df2){
+mod_redes_sociales_server <- function(input, output, session, df2, candidatos){
   ns <- session$ns
+  
+  
+  observe({ updateSelectInput(session, inputId = "candidato",choices = candidatos())
+  })
   
   
   output$reach <- renderHighchart({
     tempo <- df2$entrenamiento %>% 
+      filter(tema==input$candidato) %>% 
       mutate(fecha=floor_date(TW_CreatedAt, "day"), 
              fecha=as.Date(fecha), 
              tuits=1) %>%
@@ -81,6 +86,7 @@ mod_redes_sociales_server <- function(input, output, session, df2){
 
   output$saldo <- renderHighchart({
      en <- df2$entrenamiento %>% 
+       filter(tema==input$candidato) %>% 
        mutate(fecha=floor_date(TW_CreatedAt,unit="day"), 
               fecha=as.Date(fecha)) %>% 
        count(fecha, calificacion) %>% 
@@ -91,6 +97,7 @@ mod_redes_sociales_server <- function(input, output, session, df2){
   
   nube <- reactive({
     en <- df2$entrenamiento %>% 
+      filter(tema==input$candidato) %>% 
       filter(!is.na(calificacion)) %>% 
       select(calificacion, TW_Text) 
     procesando_nube(en)
@@ -105,6 +112,7 @@ mod_redes_sociales_server <- function(input, output, session, df2){
   output$masFavs <- renderUI({
     tagList(
         df2$entrenamiento %>% 
+        filter(tema==input$candidato) %>% 
         mutate(alca=TW_RetweetCount+TW_FavoriteCount) %>% 
         filter(alca==max(alca)) %>% 
         filter(TW_CreatedAt ==max(TW_CreatedAt)) %>%   
@@ -120,6 +128,7 @@ mod_redes_sociales_server <- function(input, output, session, df2){
   output$masmencion <- renderUI({
     tagList(
         df2$entrenamiento %>% 
+          filter(tema==input$candidato) %>% 
           filter(TW_FollowersCount ==max(TW_FollowersCount )) %>% 
           # filter(TW_InReplyToStatusID ==0 ) %>%  
           select(TW_Entities,TW_StatusID) %>% 

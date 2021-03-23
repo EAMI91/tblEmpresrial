@@ -21,11 +21,10 @@ mod_redes_general_ui <- function(id){
 #' redes_general Server Function
 #'
 #' @noRd 
-mod_redes_general_server <- function(input, output, session,  df2){
+mod_redes_general_server <- function(input, output, session,  df2, candidatos){
   ns <- session$ns
   
-  callModule(mod_red_profundo_server, "red_profundo_ui_1")
-  callModule(mod_redes_sociales_server, "redes_sociales_ui_1", df2)
+  callModule(mod_redes_sociales_server, "redes_sociales_ui_1", df2, candidatos)
  
 }
 
