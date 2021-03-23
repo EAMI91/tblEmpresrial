@@ -31,7 +31,7 @@ app_server <- function( input, output, session ) {
   
   observeEvent(df3$entidadesb, {
     entidades <- df3$entidadesb %>% pull(suscriptores) %>% 
-      set_names(df3$entidadesb %>% pull(estados))
+      set_names(df3$entidadesb %>% pull(estado))
     updateSelectizeInput(session,
                          'entidad',
                          choices = entidades,

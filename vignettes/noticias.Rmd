@@ -883,47 +883,54 @@ gra <- highchart() %>%
 treemap_calificacion(BD, candida="candidato 3")
 ```
 ```{r}
-treemap_calificacion_bis <- function(BD, candida){
-base1 <- BD %>% 
-    filter(candidato %in% candida)%>%
-         select(percepcion) %>% 
+treemap_calificacion_bis <- function(BD){
+
+  
+  
+  base1 <- BD %>% 
+    # filter(candidato %in% candida)%>%
+         select(calificacion) %>% 
+       filter(!is.na(calificacion)) %>% 
          unique() %>% 
-        mutate(color=if_else(percepcion=="Buena",
+        mutate(color=if_else(calificacion=="Positiva",
                               "#FFFFFF",                     
-                      if_else(percepcion=="Mala",
+                      if_else(calificacion=="Negativa",
                             "#FFFFFF","#FFFFFF")),
-                id=str_to_id(percepcion)) %>% 
-         rename("name"="percepcion")
+                id=str_to_id(calificacion)) %>% 
+         rename("name"="calificacion")
 base2 <- BD %>% 
-    filter(candidato %in% candida)%>%
-         count(percepcion, mencionGenerada) %>% 
-         mutate(color=if_else(percepcion=="Buena" & 
-                                mencionGenerada=="Boletines\n de prensa",
+    # filter(candidato %in% candida)%>%
+         count(calificacion, tipoFuente) %>% 
+         filter(!is.na(calificacion)) %>% 
+         mutate(tipoFuente=iconv(tipoFuente,"UTF-8","WINDOWS-1252")) %>% 
+         
+         mutate(color=if_else(calificacion=="Positiva" & 
+                                tipoFuente=="Boletín de prensa",
                               "#006d2c",
-                      if_else(percepcion=="Buena" & 
-                                mencionGenerada=="declaraciones",
+                      if_else(calificacion=="Positiva" & 
+                                tipoFuente=="Declaraciones",
                               "#31a354",
-                      if_else(percepcion=="Buena" & 
-                               mencionGenerada=="filtraciones",
+                      if_else(calificacion=="Positiva" & 
+                               tipoFuente=="Filtraciones",
                                "#74c476",
-                      if_else(percepcion=="Mala" & 
-                                mencionGenerada=="Boletines\n de prensa",
+                      if_else(calificacion=="Negativa" & 
+                                tipoFuente=="Boletín de prensa",
                                "#a50f15",
-                       if_else(percepcion=="Mala" & 
-                                mencionGenerada=="declaraciones",
+                       if_else(calificacion=="Negativa" & 
+                                tipoFuente=="Declaraciones",
                                "#de2d26",
-                       if_else(percepcion=="Mala" & 
-                                mencionGenerada=="filtraciones",
+                       if_else(calificacion=="Negativa" & 
+                                tipoFuente=="Filtraciones",
                                "#fb6a4a", 
-                      if_else(percepcion=="Regular" & 
-                                mencionGenerada=="Boletines\n de prensa",
-                               "#636363",
-                       if_else(percepcion=="Regular" & 
-                                mencionGenerada=="declaraciones",
-                               "#969696","#cccccc")))))))),
-                parent=str_to_id(percepcion),
+                      if_else(calificacion=="Neutral" & 
+                                tipoFuente=="Boletín de prensa",
+                               "#feb24c",
+                       if_else(calificacion=="Neutral" & 
+                                tipoFuente=="declaraciones",
+                               "#fed976","#ffffb2")))))))),
+                parent=str_to_id(calificacion),
                 id = as.character(row_number())) %>% 
-        rename("name"= "mencionGenerada", "value"="n")
+        rename("name"= "tipoFuente", "value"="n")
 dde <- list(base1, base2) %>%
   purrr::map(mutate_if, is.factor, as.character) %>% 
   bind_rows() %>% 
@@ -933,7 +940,7 @@ dde <- list(base1, base2) %>%
 gra <-  highchart() %>% 
   hc_chart(type = "treemap") %>% 
   hc_title(
-    text = paste0("Calificación de menciones ", candida)
+    text = "Califación de menciones de la elección"
   ) %>%
   hc_add_series(
     data = dde,
@@ -967,7 +974,7 @@ gra <-  highchart() %>%
   return(gra)
 }
 
-treemap_calificacion_bis(BD, candida="candidato 3")
+treemap_calificacion_bis(noticias)
 
 
 ```
