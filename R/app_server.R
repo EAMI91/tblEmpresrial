@@ -40,17 +40,20 @@ app_server <- function( input, output, session ) {
   })
   
    observeEvent(input$entidad, {
-      df2$entrenamiento = tbl(pool, entrenamientobd) %>% 
-        filter(estado %in% !!req(input$entidad))%>% 
-        collect()
-      df2$prueba =tbl(pool, pruebabd) %>% collect() 
-      
-      df2$noticias = tbl(pool, noticiasbd) %>% 
-        filter(estado %in% !!req(input$entidad))%>% 
-        collect() 
-      
-      df2$opciones = tbl(pool, opcionesbd) %>%
-        collect()
+
+     sus <- df3$entidadesb %>% filter(suscriptores == input$entidad) %>% pull(estado)
+     
+     df2$entrenamiento <- tbl(pool, entrenamientobd) %>% 
+       filter(estado %in% !!sus)%>% 
+       collect()
+     df2$prueba =tbl(pool, pruebabd) %>% collect() 
+     
+     df2$noticias = tbl(pool, noticiasbd) %>% 
+       filter(estado %in% !!sus)%>% 
+       collect() 
+     
+     df2$opciones = tbl(pool, opcionesbd) %>%
+       collect()
       
       
   })
