@@ -405,10 +405,10 @@ treemap_calificacion_bis <- function(BD){
                  if_else(calificacion=="Negativa" & 
                  tipoFuente=="Filtraciones",
                  "#fb6a4a", 
-                 if_else(calificacion=="Neutral" & 
+                 if_else(calificacion=="Neutra" & 
                  tipoFuente=="Boletín de prensa",
                  "#feb24c",
-                 if_else(calificacion=="Neutral" & 
+                 if_else(calificacion=="Neutra" & 
                  tipoFuente=="declaraciones",
                  "#fed976","#ffffb2")))))))),
            parent=str_to_id(calificacion),
@@ -423,7 +423,7 @@ treemap_calificacion_bis <- function(BD){
   gra <-  highchart() %>% 
     hc_chart(type = "treemap") %>% 
     hc_title(
-      text = "Califación de menciones de la elección"
+      text = "Calificación de menciones de la elección"
     ) %>%
     hc_add_series(
       data = dde,

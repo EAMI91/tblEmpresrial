@@ -978,3 +978,166 @@ treemap_calificacion_bis(noticias)
 
 
 ```
+
+
+```{r}
+op <- opciones %>% 
+     select(idCategoria, variable, categoria) %>%
+      pivot_wider(names_from = variable, values_from = categoria) %>% 
+      mutate(Candidato = idCandidato, idCandidato = idCategoria) %>%
+      select(idCandidato, Candidato) %>% 
+      filter(!is.na(Candidato))
+
+prueba <- noticias %>% 
+  left_join(op, by = "idCandidato") %>%
+  filter(idCandidato==1)
+
+treemap_calificacion_cand <- function(BD){
+
+base1 <- BD %>% 
+    # filter(candidato %in% candida)%>%
+         select(calificacion) %>% 
+       filter(!is.na(calificacion)) %>% 
+         unique() %>% 
+        mutate(color=if_else(calificacion=="Positiva",
+                              "#FFFFFF",                     
+                      if_else(calificacion=="Negativa",
+                            "#FFFFFF","#FFFFFF")),
+                id=str_to_id(calificacion)) %>% 
+         rename("name"="calificacion")
+base2 <- BD %>% 
+    # filter(candidato %in% candida)%>%
+         count(calificacion, tipoFuente) %>% 
+         filter(!is.na(calificacion)) %>% 
+         mutate(tipoFuente=iconv(tipoFuente,"UTF-8","WINDOWS-1252")) %>% 
+         
+         mutate(color=if_else(calificacion=="Positiva" & 
+                                tipoFuente=="Boletín de prensa",
+                              "#006d2c",
+                      if_else(calificacion=="Positiva" & 
+                                tipoFuente=="Declaraciones",
+                              "#31a354",
+                      if_else(calificacion=="Positiva" & 
+                               tipoFuente=="Filtraciones",
+                               "#74c476",
+                      if_else(calificacion=="Negativa" & 
+                                tipoFuente=="Boletín de prensa",
+                               "#a50f15",
+                       if_else(calificacion=="Negativa" & 
+                                tipoFuente=="Declaraciones",
+                               "#de2d26",
+                       if_else(calificacion=="Negativa" & 
+                                tipoFuente=="Filtraciones",
+                               "#fb6a4a", 
+                      if_else(calificacion=="Neutral" & 
+                                tipoFuente=="Boletín de prensa",
+                               "#feb24c",
+                       if_else(calificacion=="Neutral" & 
+                                tipoFuente=="declaraciones",
+                               "#fed976","#ffffb2")))))))),
+                parent=str_to_id(calificacion),
+                id = as.character(row_number())) %>% 
+        rename("name"= "tipoFuente", "value"="n")
+dde <- list(base1, base2) %>%
+  purrr::map(mutate_if, is.factor, as.character) %>% 
+  bind_rows() %>% 
+  list_parse() %>% 
+  purrr::map(function(x) x[!is.na(x)])
+
+gra <- highchart() %>% 
+  hc_chart(type = "treemap") %>% 
+  hc_title(
+    text = paste0("Califación de menciones de ", unique(BD$Candidato))
+  ) %>%
+  hc_add_series(
+    data = dde,
+    allowDrillToNode = TRUE,
+    levelIsConstant = TRUE,
+    textOverflow = "clip",
+    dataLabels = list(color = "white"),
+    levels = list(
+      list(
+        level = 1,
+        borderWidth = 8,
+        dataLabels = list(
+          enabled = TRUE,
+          verticalAlign = "top",
+          align = "left",
+          style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        ),
+      list(
+        level = 2,
+        borderWidth = 0,
+        dataLabels = list(enabled = FALSE)
+        )
+      )
+    ) %>% 
+  # esto es para que el primer nivel, que no tiene color asigando, 
+  # sea transparente.
+  hc_colors("trasnparent")
+
+  return(gra)
+}
+
+treemap_calificacion_cand(prueba)
+
+
+
+
+
+```
+
+
+```{r}
+
+prueba <- noticias %>% 
+  left_join(op, by = "idCandidato") %>% 
+    filter(!is.na(Candidato)) %>% 
+    mutate(n  =  1) %>%
+    group_by(calificacion, Candidato) %>%
+    summarise(across(n, sum)) %>% 
+   ungroup() %>%
+  mutate(totales=sum(n),
+         percentage=round((n/totales)*100,2)) %>%
+  mutate(label = paste(round(percentage, 1), "%", sep = " ")) 
+# %>% 
+#   ungroup() %>% 
+#   mutate(totales=sum(n), 
+#          percentage=round((n/totales)*100,2)) %>% 
+#   mutate(label = paste(round(percentage, 1), "%", sep = " ")) 
+
+
+      barras_candidatos(prueba, col="calificacion", title="Tipo de evento")
+```
+
+
+```{r}
+optemas <- opciones%>% 
+       select(idCategoria, variable, categoria) %>%
+        pivot_wider(names_from = variable, values_from = categoria) %>% 
+        mutate(Tema_1 = idTema, idTema_1 = idCategoria,
+               Tema_2 = Tema_1, idTema_2 = idTema_1,
+               Tema_3 = Tema_2, idTema_3 = idTema_2) %>%
+        select(idTema_1, Tema_1,idTema_2, Tema_2, idTema_3, Tema_3) %>% 
+        filter(!is.na(Tema_1))
+
+temas1 <- optemas %>% 
+          select(idTema_1, Tema_1)
+
+
+prueba <- noticias %>% 
+  # mutate(declaracion_1=iconv(declaracion_1,"UTF-8","WINDOWS-1252"))
+  left_join(temas1, by = "idTema_1") %>% 
+   mutate(
+      Tema_1_otro = ifelse(Tema_1 == "Otros", Tema_1, NA)
+      )
+
+temas_eleccion(prueba,
+                   pregunta = Tema_1,
+                   otro = Tema_1_otro,
+                   x = 0,
+                   titulo = "Temas de la elección general")
+
+```
+

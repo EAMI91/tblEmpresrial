@@ -86,15 +86,27 @@ mod_noticias_server <- function(input, output, session, df2){
   
   output$termometro <- renderHighchart({
     paratermo <- df2$noticias %>% 
-             mutate(nivel=nrow(.)*20)
+             mutate(nivel=nrow(.)*1)
     paratermo <- paratermo$nivel
     termo(paratermo)
   })
  
   output$temasEleccion <- renderHighchart({
-    temas_eleccion(bd(),
-                   pregunta = temas,
-                   otro = temasOtro,
+    
+    temas1 <- bd.tema() %>% 
+      select(idTema_1, Tema_1)
+    
+    
+    prueba <- df2$noticias%>% 
+      left_join(temas1, by = "idTema_1") %>% 
+      mutate(
+        Tema_1_otro = ifelse(Tema_1 == "Otros", Tema_1, NA)
+      )
+    
+    
+    temas_eleccion(prueba,
+                   pregunta = Tema_1,
+                   otro = Tema_1_otro,
                    x = 0,
                    titulo = "Temas de la elección general")
   })
