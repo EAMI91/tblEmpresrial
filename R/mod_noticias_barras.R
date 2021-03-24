@@ -73,13 +73,13 @@ mod_noticias_barras_server <- function(input, output, session, df2){
     
     bd.partido(
       
-      opciones %>% select(idCategoria, variable, categoria) %>%      
+      df2$opciones %>% select(idCategoria, variable, categoria) %>%      
         pivot_wider(names_from = variable, values_from = categoria) %>% 
         mutate(Partido = idPartido, idPartido = idCategoria) %>%       
         select(idPartido, Partido) %>% 
         filter(!is.na(Partido))%>% 
-        mutate(color=if_else(Partido=="morena", "#BF3722", 
-                     if_else(Partido=="Independiente", "#9E7BB5",
+        mutate(color=if_else(Partido=="MORENA", "#BF3722", 
+                     if_else(Partido=="INDEPENDIENTE", "#9E7BB5",
                      if_else(Partido=="PAN", "#2260BF",
                      if_else(Partido=="PRI", "#23A95D","#E6BD19")))))
       

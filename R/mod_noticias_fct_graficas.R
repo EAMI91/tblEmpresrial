@@ -384,8 +384,7 @@ treemap_calificacion_bis <- function(BD){
   base2 <- BD %>% 
     # filter(candidato %in% candida)%>%
     count(calificacion, tipoFuente) %>% 
-    filter(!is.na(calificacion)) %>% 
-    mutate(tipoFuente=iconv(tipoFuente,"UTF-8","WINDOWS-1252")) %>% 
+    filter(!is.na(calificacion)) %>%  
     
     mutate(color=if_else(calificacion=="Positiva" & 
                  tipoFuente=="Boletín de prensa",
@@ -409,7 +408,7 @@ treemap_calificacion_bis <- function(BD){
                  tipoFuente=="Boletín de prensa",
                  "#feb24c",
                  if_else(calificacion=="Neutra" & 
-                 tipoFuente=="declaraciones",
+                 tipoFuente=="Declaraciones",
                  "#fed976","#ffffb2")))))))),
            parent=str_to_id(calificacion),
            id = as.character(row_number())) %>% 

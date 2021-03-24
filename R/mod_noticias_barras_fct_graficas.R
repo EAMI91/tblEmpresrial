@@ -20,7 +20,7 @@ barras_candidatos <- function(bd,  col, title){
   hc_title(text = as.character(title)) %>% 
   hc_xAxis(title = " ") %>% 
   hc_yAxis(title = " ") %>%   
-  hc_colors(colors = unique(barra$color[order(barra$Candidato)])) %>% 
+  hc_colors(colors = unique(bd$color[order(bd$Candidato)])) %>% 
   hc_chart(style = list(fontFamily = "Avenir next"
   ))
 return(graph)
@@ -44,7 +44,6 @@ treemap_calificacion_cand <- function(BD){
     # filter(candidato %in% candida)%>%
     count(calificacion, tipoFuente) %>% 
     filter(!is.na(calificacion)) %>% 
-    mutate(tipoFuente=iconv(tipoFuente,"UTF-8","WINDOWS-1252")) %>% 
     
     mutate(color=if_else(calificacion=="Positiva" & 
                  tipoFuente=="Boletín de prensa",
@@ -68,7 +67,7 @@ treemap_calificacion_cand <- function(BD){
                  tipoFuente=="Boletín de prensa",
                  "#feb24c",
                  if_else(calificacion=="Neutra" & 
-                 tipoFuente=="declaraciones",
+                 tipoFuente=="Declaraciones",
                  "#fed976","#ffffb2")))))))),
            parent=str_to_id(calificacion),
            id = as.character(row_number())) %>% 
