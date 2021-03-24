@@ -1,0 +1,973 @@
+---
+title: "noticias"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{noticias}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = F, 
+message = F,
+warning = F, 
+fig.asp = 0.8, 
+fig.width = 7, 
+out.width = "100%",
+dpi = 300,
+collapse = TRUE,
+comment = "#>"
+) 
+```
+
+```{r setup}
+library(dplyr)
+library(tidyr)
+library(highcharter)
+library(quanteda)
+library(ggthemes)
+library(ggfittext)
+library(plotly)
+library(RColorBrewer)
+library(ggchicklet)
+```
+
+```{r}
+noticias <- noticias_prueba %>% 
+                  mutate(fecha=floor_date(fecha,unit = "day"), 
+                         fecha=as.Date(fecha)) %>% 
+                  filter(!is.na(calificacion)) %>% 
+                  count(fecha, calificacion)
+
+  noticias %>% hchart(hcaes(x = fecha, y = n, group = calificacion), type="line"
+  )  %>%
+  hc_colors(c("#710627", "#CF8C40", "#BBC200")) %>% 
+  hc_plotOptions(line= list(lineWidth = 4,
+                              marker = list(radius =5),
+                              stickyTracking=F)) %>% 
+  hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
+           lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
+           showLastLabel= F,
+           labels = list(step = 2, style = list(fontSize = "16px", color = "#001c44") )) %>%
+  hc_yAxis(crosshair = F, title = list(text = "Número de Noticias"), tickAmount = 3, 
+           gridLineWidth =.5, showFirstLabel = F,
+           labels = list( style = list(fontSize = "12px") )) %>%
+  #title
+  hc_title(text = "<b>Calificación de Noticias</b>",
+           align = "left", style = list(fontSize = "22px", color = "#13384D")) %>% 
+  hc_tooltip(
+          sort = F,
+          shared = T,
+          borderWidth= 0,
+          split = T,
+          pointFormat = "<br> <b>Calificación</b>: {series.name} <br> <p><b> Número de noticias</b>: {point.Noticias} </p>",
+          headerFormat = '<span style="font-size: 15px">{point.key}</span><br/>',
+          style = list(fontSize = "16px", color = "#41657A"),
+          useHTML = F) %>% 
+  hc_chart(style = list(fontFamily = "Avenir Next"), backgroundColor = "#FFF")
+
+
+# Timeline
+timeline_noticias <- function(bd){
+  # Funciones para volver al español
+  # hcoptslang <- getOption("highcharter.lang")
+  # hcoptslang$weekdays<- c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
+  # hcoptslang$shortMonths <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+  # hcoptslang$months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+  # hcoptslang$thousandsSep <- c(",")
+  # options(highcharter.lang = hcoptslang)
+  
+  
+hc <- bd %>% 
+  hchart(hcaes(x = fecha, y = n, group = calificacion), type="line"
+  )  %>%
+  hc_colors(c("#710627", "#CF8C40", "#BBC200")) %>% 
+  hc_plotOptions(line= list(lineWidth = 4,
+                              marker = list(radius =5),
+                              stickyTracking=F)) %>% 
+  hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
+           lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
+           showLastLabel= F,
+           labels = list(step = 2, style = list(fontSize = "16px", color = "#001c44") )) %>%
+  hc_yAxis(crosshair = F, title = list(text = "Número de Noticias"), tickAmount = 3, 
+           gridLineWidth =.5, showFirstLabel = F,
+           labels = list( style = list(fontSize = "12px") )) %>%
+  #title
+  hc_title(text = "<b>Calificación de Noticias</b>",
+           align = "left", style = list(fontSize = "22px", color = "#13384D")) %>% 
+  hc_tooltip(
+          sort = F,
+          shared = T,
+          borderWidth= 0,
+          split = T,
+          pointFormat = "<br> <b>Calificación</b>: {series.name} <br> <p><b> Número de noticias</b>: {point.Noticias} </p>",
+          headerFormat = '<span style="font-size: 15px">{point.key}</span><br/>',
+          style = list(fontSize = "16px", color = "#41657A"),
+          useHTML = F) %>% 
+  hc_chart(style = list(fontFamily = "Avenir Next"), backgroundColor = "#FFF")
+  return(hc)
+}
+timeline_noticias(noticias)
+```
+# Timeline
+```{r}
+E %>%  mutate(calificacion = factor(calificacion, c("Mala", "Regular", "Buena"))) %>% timeline_noticias()
+```
+
+```{r}
+noticias <- noticias_prueba %>% 
+            filter(!is.na(calificacion)) %>% 
+            filter(estado!="Nuevo León")
+  words <- select(noticias, texto, calificacion) 
+  titulo <- "Temas electoraes"
+  #corp_tm <- tm::VCorpus(tm::VectorSource(words))
+  corp_quanteda <- corpus(words,text_field = "texto")
+  Nube <- dfm(corp_quanteda, remove = stopwords("english"),
+              remove_punct = TRUE, groups = "calificacion")
+  
+procesando_nube <- function(bd, z){
+  words <- select(bd, text, calificacion) %>% na.omit() 
+  titulo <- "Temas electoraes"
+  #corp_tm <- tm::VCorpus(tm::VectorSource(words))
+  corp_quanteda <- corpus(words)
+  Nube <- dfm(corp_quanteda, remove = stopwords("english"),
+              remove_punct = TRUE, groups = "calificacion")%>%
+    dfm_trim(min_termfreq = z)
+  return(Nube)
+}
+
+Nube <- procesando_nube(G, 10)
+
+graficando_nube <- function(db, z){
+  nube <- textplot_wordcloud(db, min_count = z,comparison = TRUE, max_words = 300, adjust = 0, rotation   = 0.1, random_order = FALSE,random_color = FALSE, ordered_color = FALSE,
+                             # font = "Avenir Next",
+                             labelsize= 1.5,
+                             labelcolor =  "#161F29",
+                             labeloffset = .001,
+                             color = c("#0f4c42", "#cb2833", "#91d400", "#174a80", "#ffc200"))+ theme_minimal()+
+    theme(text=element_text(size=16,   family="Avenir Next"),
+          panel.border = element_blank())
+  
+  return(nube)
+}
+
+graficando_nube_not(Nube,5)
+```
+# Nube de palabras de noticias
+```{r}
+graficando_nube(Nube, 10)
+```
+
+```{r}
+# Termometro
+
+termometro_electoral <- function(){
+  termometro <- plot_ly(
+  type = "indicator",
+  mode = "gauge+number",
+  value = 70,
+  title = list(text = "Termómetro electoral estatal", font = list(size = 20), color = "#13384D"),
+  gauge = list(
+    axis = list(range = list(NULL, 100), tickwidth = 1, tickcolor = "#13384D" ),
+    bar = list(color = "#FFFFFF", width = 0.4, thickness = 0.08),
+    bgcolor = "white",
+    borderwidth = 2.5,
+    bordercolor = "white",
+    steps = list(
+      list(range = c(0, 20), color = "#710627"),
+      list(range = c(20, 40), color = "#DB3D35"),
+      list(range = c(40, 60), color = "#E08931"),
+      list(range = c(60, 80), color = "#C2BF15"),
+      list(range = c(80, 100), color = "#89A100")
+      ),
+    threshold = list(
+      line = list(color = "#13384D", width = 4),
+      thickness = 1.0,
+      value = 70))
+  ) 
+
+termometro <- termometro %>%
+  layout(
+    margin = list(l=15,r=30),
+    paper_bgcolor = "white",
+    font = list(color = "#13384D", family = "Avenir Next"))
+
+  return(termometro)
+}
+```
+# Termometro Electoral Estatal
+```{r}
+termometro_electoral()
+```
+
+```{r}
+n <- 1000
+a <- tibble( id = 1:n,
+  temas = sample(c("Deportes", "Cultura", "Sociedad", "Tecnología", "Otros"), n, replace=T))
+a <- mutate(a, temasOtro = case_when(temas == "Otros" ~ "Otro tema"))
+  
+H <- G %>% left_join(a)
+
+temas_eleccion <- function(bd, pregunta, otro, x, titulo =""){
+  bd_2 <- bd %>% filter({{ pregunta }} %in% c('Otro'))
+  
+  bd_1 = count(bd, {{ pregunta }}) %>%
+    mutate(n  = round(100*n/sum(n),2)) %>%
+    arrange(-n)
+  
+  nTot <- bd_1 %>%
+    select(n) %>%
+    mutate(sum = sum(n)) %>%
+    select(sum)
+  
+  nTot <- nTot[1,1]$sum
+  
+  bd_1 <- bd_1 %>%
+    filter(!{{ pregunta }} %in% c('Otro'))
+  
+  bd_1 <- bd_1 %>% mutate(n  = round(n/100, 2)) %>%
+    spread(value = n, key = {{ pregunta }})
+  
+  bd_2 <- count(bd_2, {{ otro }}) %>%
+    mutate(porcentaje  = round(100*n/sum(n), 2)) %>%
+    filter(porcentaje > x)
+  
+  bd_2 <- select(bd_2, -porcentaje) 
+  
+  bd_2 <- bd_2 %>% mutate(n = round(n/nTot,2)) %>%
+    spread(value = n, key = {{ otro }})
+  
+  if(nrow(bd_1) != nrow(bd_2)){
+    
+    Graph <- bd_1 %>%  gather(x, y) %>% mutate(y = round(y *100)) %>% 
+      hchart(hcaes(x = x, y  =y), type = "line") %>%  
+      hc_title(text =paste("<b>", titulo,"<b>") , align = "left", style = list(fontSize = "22px", color = "#13384D")) %>% 
+      hc_plotOptions(line = list(lineWidth = 7, marker = list(radius = 7))) %>% 
+      hc_yAxis(lineWidth =0, title = list(enabled = F),
+               tickAmount = 4, showLastLabel = T,
+               gridLineWidth  =1,
+               gridLineDashStyle = "longdash",
+               lineDashStyle = "longdash",
+               labels = list(enabled = F,  format=paste0("{value}%"))) %>% 
+      hc_xAxis(title = list(enabled = F), 
+               lineWidth = 1,
+               gridLineWidth =0,
+               labels = list(style = list(
+        fontFamily = "Avenir Next",
+        # color = "#0c5776",
+        fontSize = "16px"))) %>% 
+      hc_colors("#4F5F80") %>% 
+      hc_tooltip(headerFormat = "",
+                 pointFormat= '<b>{point.y}%</b>',
+                 borderWidth= 0, shape = "square", shadow=F) %>% 
+            hc_chart(polar = T, style = list(fontFamily = "Avenir Next"))
+  }else{
+    
+    df <- data.frame(bd_1, bd_2)
+    titulos <- df %>%  colnames() %>%  str_to_sentence()
+    df <- df %>%  set_names(titulos)
+    Graph <-  df %>% gather(x, y) %>% mutate(y = round(y *100)) %>% 
+      hchart(hcaes(x = x, y  =y), type = "line") %>%  
+      hc_chart(polar = T, style = list(fontFamily = "Avenir Next")) %>% 
+      hc_title(text = titulo,
+           align = "left", style = list(fontSize = "22px", color = "#13384D")) %>% 
+      hc_plotOptions(line = list(lineWidth = 5, marker = list(radius = 7))) %>% 
+      hc_yAxis(lineWidth =0, title = list(enabled = F),
+               # tickAmount = 3, 
+               showLastLabel = T,
+               gridLineDashStyle = "longdash",
+               lineDashStyle = "longdash",
+               labels = list(  format=paste0("{value}%"))) %>% 
+      hc_xAxis(title = list(enabled = F), labels = list(style = list(color = "#0c5776", fontFamily  = "Avenir Next", fontSize = "18px"))) %>% 
+      hc_colors("#81cbfe")%>% 
+      hc_tooltip(headerFormat = "",
+                 pointFormat= '<b>{point.y}%</b>',
+                 borderWidth= 0, shape = "square", shadow=F)
+    
+  }
+  
+  return(Graph)
+}
+```
+
+# TEMAS DE LA ELECCIÓN GENERAL
+```{r}
+temas_eleccion(H,
+               pregunta = temas,
+               otro = temasOtro,
+               x = 0,
+               titulo = "Temas de la elección general")
+```
+
+```{r}
+## Eventos
+Eventos <- tibble(id = 1:n,
+tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
+candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T)
+)
+
+tipos_eventos <- function(bd, candidatos){
+
+bd <- bd %>%
+  filter(candidato %in% candidatos)%>% 
+  mutate(n  =  1) %>%
+  group_by(tipoEvento, candidato) %>%
+  summarise(across(n, sum)) %>% 
+  mutate(percentage =round(100*n/sum(n))) %>% 
+  mutate(label = paste(round(percentage, 1), "%", sep = " "))
+  
+Graph <- ggplot(bd, aes(x = tipoEvento, y = percentage,
+          fill = as.factor(candidato), label = label)) +
+  ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
+                            radius = grid::unit(5, "pt"), width = .9, alpha =.85)+
+          # geom_col(width = 0.9, position = position_dodge(0.95)) + 
+          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", vjust = 1, color = "#FFFFFF") +
+  # geom_text( hjust = 1.3, color = "#FFFFFF", size = 8, position = ggplot2::position_dodge())+
+          theme_hc() + scale_fill_calc() + 
+          labs(title = "Tipos de eventos", caption = "", x = "", y = "") +
+          theme(
+              axis.ticks.y=element_blank(), 
+              axis.title.y = element_blank(),
+              axis.title.x = element_text(color = "#8b878d"),
+              text = element_text(family = "Avenir Next", size = 12),
+              plot.title = element_text(size = 15,
+                                        colour =  "#13384D",
+                                        hjust = 0, face = "bold"),
+              axis.text.y = element_blank(),
+              axis.text.x = element_text(family = "Avenir Next", size = 12),
+              legend.title=element_blank()
+            )
+
+  return(Graph)
+}
+```
+## Eventos
+```{r}
+tipos_eventos(Eventos, c("candidato 1", "candidato 2", "candidato 3"))
+```
+
+```{r}
+# CANDIDATOS Y SU PERCEPCIÓN EN MEDIOS
+percep <- tibble(id = 1:n, 
+percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+)
+
+BD <- left_join(Eventos, percep)
+
+percepcion_medios <- function(bd, candidatos){
+  
+  bd <- bd %>%
+    filter(candidato %in% candidatos)%>% 
+    mutate(n  =  1) %>%
+    group_by(percepcion, candidato) %>%
+    summarise(across(n, sum)) %>% 
+    mutate(percentage = 100*n/sum(n)) %>% 
+    mutate(label = paste(round(percentage, 1), "%", sep = " "))
+  
+  Graph <- ggplot(bd, aes(x = percepcion, y = percentage,
+                          fill = as.factor(candidato), label = label)) +
+    geom_col(width = 0.9, position = position_dodge(0.95)) + 
+    geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top") +
+    theme_hc() + scale_fill_calc() + 
+    labs(title = "Percepción en Medios", caption = "", x = "", y = "") +
+    theme(
+      axis.ticks.y=element_blank(), 
+      axis.title.y = element_blank(),
+      axis.title.x = element_text(color = "#8b878d"),
+      text = element_text(family = "Avenir Next", size = 12),
+      plot.title = element_text(size = 15,
+                                colour =  "#13384D",
+                                hjust = 0, face = "bold"),
+      axis.text.y = element_blank(),
+      axis.text.x = element_text(family = "Avenir Next", size = 12),
+      legend.title=element_blank()
+    )
+  
+  return(Graph)
+}
+```
+# CANDIDATOS Y SU PERCEPCIÓN EN MEDIOS
+```{r}
+percepcion_medios(BD,  c("candidato 1", "candidato 2", "candidato 3"))
+```
+
+```{r}
+# MENCIONES DEL CANDIATO GENERADAS (incluye filtros por candidato)
+# (Boletines de prensa, declaraciones, filtraciones)
+
+mencion <- tibble(id = 1:n, 
+mencionGenerada = sample(c("Boletines\n de prensa", "declaraciones", "filtraciones"), n, replace = T),
+)
+
+BD <- left_join(BD, mencion)
+
+mencion_generada <- function(bd, candidatos){
+  
+  bd <- bd %>%
+    filter(candidato %in% candidatos)%>% 
+    mutate(n  =  1) %>%
+    group_by(mencionGenerada, candidato) %>%
+    summarise(across(n, sum)) %>% 
+    mutate(percentage = 100*n/sum(n)) %>% 
+    mutate(label = paste(round(percentage, 1), "%", sep = " "))
+  
+  Graph <- ggplot(bd, aes(x = mencionGenerada, y = percentage,
+                          fill = as.factor(candidato), label = label)) +
+    ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
+                            radius = grid::unit(5, "pt"), width = .9, alpha =.85)+
+          # geom_col(width = 0.9, position = position_dodge(0.95)) + 
+          geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top", vjust = 1, color = "#FFFFFF")+
+    # geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top") +
+    theme_hc() + scale_fill_calc() + 
+    labs(title = "Menciones del candidato generadas", caption = "", x = "", y = "") +
+    theme(
+      axis.ticks.y=element_blank(), 
+      axis.title.y = element_blank(),
+      axis.title.x = element_text(color = "#8b878d"),
+      text = element_text(family = "Avenir Next", size = 12),
+      plot.title = element_text(size = 15,
+                                colour =  "#13384D",
+                                hjust = 0, face = "bold"),
+      axis.text.y = element_blank(),
+      axis.text.x = element_text(family = "Avenir Next", size = 12),
+      legend.title=element_blank()
+    )
+  
+  return(Graph)
+}
+```
+# MENCIONES DEL CANDIATO GENERADAS 
+```{r}
+mencion_generada(BD,  c("candidato 1", "candidato 2", "candidato 3"))
+```
+
+```{r}
+# MENCIONES DEL CANDIATO NO GENERADAS (incluye filtros por candidato)
+# (lo que dicen otros personjes, columnistas, adversarios, partidarios)
+
+mencionNo <- tibble(id = 1:n, 
+mencionNoGenerada = sample(c("personaje", "columnista", "adversario", "partidario"), n, replace = T),
+)
+
+BD <- left_join(BD, mencionNo)
+
+mencion_no_generada <- function(bd, candidatos){
+  
+  bd <- bd %>%
+    filter(candidato %in% candidatos)%>% 
+    mutate(n  =  1) %>%
+    group_by(mencionNoGenerada, candidato) %>%
+    summarise(across(n, sum)) %>% 
+    mutate(percentage = 100*n/sum(n)) %>% 
+    mutate(label = paste(round(percentage, 1), "%", sep = ""))
+  
+  Graph <- ggplot(bd, aes(x = mencionNoGenerada, y = percentage,
+                          fill = as.factor(candidato), label = label)) +
+    geom_col(width = 0.9, position = position_dodge(0.95)) + 
+    geom_bar_text(position = "dodge", grow = F, reflow = T, place = "top") +
+    theme_hc() + scale_fill_calc() + 
+    labs(title = "Menciones del candidato no generadas", caption = "", x = "", y = "") +
+    theme(
+      axis.ticks.y=element_blank(), 
+      axis.title.y = element_blank(),
+      axis.title.x = element_text(color = "#8b878d"),
+      text = element_text(family = "Avenir Next", size = 12),
+      plot.title = element_text(size = 15,
+                                colour =  "#13384D",
+                                hjust = 0, face = "bold"),
+      axis.text.y = element_blank(),
+      axis.text.x = element_text(family = "Avenir Next", size = 12),
+      legend.title=element_blank()
+    )
+  
+  return(Graph)
+}
+```
+
+```{r}
+mencion_no_generada(BD,  c("candidato 1", "candidato 2", "candidato 3"))
+```
+
+
+
+# Top 10 dónde y quien mencionó al Candidato – Generadas Calificadas
+```{r}
+# (incluye filtros por candidato)
+
+calificacion_generada <- tibble(id = 1:n, 
+calif_generada = sample(c("Mala", "Buena", "Regular"), n, replace = T),
+)
+
+BD <- left_join(BD, calificacion_generada)
+
+calificada_generada <- function(bd, cand){
+
+  bd <- bd %>%
+    filter(candidato == cand) %>% 
+    mutate(n = 1) %>% 
+    group_by(mencionGenerada, calif_generada) %>% 
+    summarise(across(n, sum)) %>% 
+    mutate(mencionGenerada = stringr::str_to_sentence(mencionGenerada),
+           calif_generada = factor(calif_generada, c("Mala", "Regular", "Buena")))
+  
+  cand_1 <- as.character(cand)
+  
+  Graph <- ggplot(bd, aes(y = n, x = mencionGenerada,
+           fill = as.factor(calif_generada), label = n)) +
+    ggchicklet::geom_chicklet(position = ggplot2::position_dodge(),
+                            radius = grid::unit(4, "pt"), width = .9, alpha =.8)+
+          geom_bar_text(position = "dodge", grow = F, reflow = F, 
+                        # place = "top",
+                        color = "#FFFFFF")+
+           theme_minimal() + scale_fill_manual(values = c("Buena"= "#89A100",
+                                                          "Mala" = "#710627", 
+                                                          "Regular" = "#E08931")) +
+           labs(title = paste("Calificación de menciones generadas de", cand_1, sep = " "),
+           caption = "", x = "Frecuencia", y = "") +
+           theme(
+             panel.grid.minor = element_blank(),
+             panel.grid.major.y = element_blank(),
+              axis.title.y = element_blank(),
+              axis.title.x = element_text(color = "#8b878d"),
+              text = element_text(family = "Avenir Next", size = 12),
+              plot.title = element_text(size = 14, colour =  "#13384D", hjust = 0, face = "bold"),
+              axis.text.y = element_text(family = "Avenir Next", size = 12),
+              legend.title = element_blank()
+            )+ coord_flip()
+  
+  return(Graph)
+}
+```
+
+```{r}
+calificada_generada(BD, cand = "candidato 1")
+```
+
+# Top 10 dónde y quien mencionó al Candidato – No generadas calificadas
+```{r}
+# (incluye filtros por candidato)
+
+calificacion_no_generada <- tibble(id = 1:n, 
+calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+)
+
+BD <- left_join(BD, calificacion_no_generada)
+
+calificada_no_generada <- function(bd, cand){
+  
+  bd <- bd %>%
+    filter(candidato == cand) %>% 
+    mutate(n = 1) %>% 
+    group_by(mencionNoGenerada, calif_no_generada) %>% 
+    summarise(across(n, sum)) 
+  
+  cand_1 <- as.character(cand)
+  
+  Graph <- ggplot(bd, aes(x = n, y = mencionNoGenerada,
+           fill = as.factor(calif_no_generada), label = n)) +
+           geom_col(width = 0.9, position = position_dodge(0.95)) +
+           geom_bar_text(position = "dodge", grow = F, reflow = T, place = "right") +
+           theme_minimal() + scale_fill_manual(values = c("#33CA7F", "#FC9F5B", "#ECE4B7")) +
+           labs(title = paste("Calificación de menciones no generadas de", cand_1, sep = " "),
+           caption = "", x = "Frecuencia", y = "") +
+           theme(
+              axis.title.y = element_blank(),
+              axis.title.x = element_text(color = "#8b878d"),
+              text = element_text(family = "Avenir Next", size = 12),
+              plot.title = element_text(size = 14, colour =  "#13384D", hjust = 0, face = "bold"),
+              axis.text.y = element_text(family = "Avenir Next", size = 12),
+              legend.title=element_blank()
+            )
+  
+  return(Graph)
+}
+```
+
+```{r}
+calificada_no_generada(BD,  cand = "candidato 2")
+```
+
+```{r}
+#Eventos treemap
+colores <- c("#174a80", "#00A896",
+             "#0f4c42", "#cb2833", "#91d400","#ffc200")
+Eventos <- tibble(id = 1:n,
+tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
+candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T)
+)
+
+Eventos %>% count(candidato, tipoEvento) %>% 
+  hchart(hcaes(x = tipoEvento, y = n, group = candidato), type = "bar") %>%
+  hc_title(text = "Tipo de Eventos") %>% 
+  hc_colors(c("#174a80", "#00A896",
+             "#0f4c42", "#cb2833"))
+
+```
+```{r}
+
+percep <- tibble(id = 1:n, 
+percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+)
+
+BD <- left_join(Eventos, percep) 
+      BD%>% 
+      count(candidato, percepcion) %>% 
+      group_by(candidato) %>% 
+      mutate(totales= sum(n)) %>% 
+      ungroup() %>% 
+      mutate(porc=round((n/totales)*100, 2)) %>%  
+  hchart(hcaes(x = percepcion, y = porc, group = candidato), type = "bar") %>%
+  hc_title(text = "Percepción") %>% 
+  hc_colors(colores)
+
+
+
+```
+
+```{r}
+n <- 1000
+    BD <- tibble(
+    id = 1:n,
+    tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
+    candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T),
+    percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+    mencionGenerada = sample(c("Boletines\n de prensa", "declaraciones", "filtraciones"), n, replace = T),
+    mencionNoGenerada = sample(c("personaje", "columnista", "adversario", "partidario"), n, replace = T),
+    calif_generada = sample(c("Mala", "Buena", "Regular"), n, replace = T),
+    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T)
+    )
+
+barras_candidatos <- function(bd, candidatos, col, title){
+  
+  bd <- bd %>%
+    mutate(n  =  1) %>%
+    group_by(!!sym(col), candidato) %>%
+    summarise(across(n, sum)) %>% 
+    mutate(percentage =round(100*n/sum(n))) %>% 
+    mutate(label = paste(round(percentage, 1), "%", sep = " "))
+  
+  Graph <- hchart(bd, hcaes(x = !!sym(col), y = percentage, group = candidato), 
+         type = "bar") %>%
+    hc_title(text = as.character(title)) %>% 
+        hc_xAxis(title = "") %>% 
+      hc_colors(c("#174a80", "#00A896",
+                "#0f4c42", "#cb2833")) %>%
+  hc_plotOptions(bar = list(stacking = F, borderRadius = 5,
+                            dataLabels= list(enabled =F,
+                                             align= "center",
+                                             inside= F,
+                                             # rotation = 5,
+                                             verticalAlign= 'top',
+                                             # x = -5,
+                                             crop= F,
+                                             overflow= "none",
+                                             style=list(color="BLACK", fontSize = "25px", textOutline= "3px contrast"),
+                                             format = paste0("{point.n:,.0f} ")
+                            )
+  ))
+  
+
+
+    
+  return(Graph)
+}
+
+ barras_candidatos(BD, c("candidato 1", "candidato 2", "candidato 3"),
+                      col="percepcion", title="Percepción en Medios")
+
+```
+```{r}
+
+barras_candidatos(BD, c("candidato 1", "candidato 2", "candidato 3"),
+                      col="mencionGenerada", "Menciones del candidato generadas")
+
+
+```
+
+
+
+```{r}
+library(readr)
+
+url_base <- "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv"
+
+pkmnes <- read_csv(file.path(url_base, "pokemon.csv"))
+pkmnes
+
+pkmn_nombre_tipos <- read_csv(file.path(url_base, "type_names.csv")) %>% 
+  # inglés es 9, Japonez es 1, español 7
+  filter(local_language_id == 9)
+
+pkmn_tipo <- read_csv(file.path(url_base, "pokemon_types.csv"))
+pkmn_tipo <- pkmn_tipo %>% 
+  mutate(slot = paste0("type_", slot)) %>% 
+  left_join(pkmn_nombre_tipos, by = "type_id") %>% 
+  select(pokemon_id, slot, name) %>% 
+  spread(slot, name)
+
+
+
+
+pkmn_colores_tipo <- pkmn_nombre_tipos %>% 
+  pull(name) %>% 
+  setdiff(c("???", "Shadow")) %>% 
+  purrr::map_df(function(t){
+  # t <- "psychic"
+  message(t)
+  
+  col <- "http://pokemon-uranium.wikia.com/wiki/Template:%s_color" %>% 
+    sprintf(t) %>%
+    xml2::read_html() %>% 
+    rvest::html_nodes("span > b") %>% 
+    rvest::html_text()
+  
+  tibble(type = t, color = paste0("#", col))
+})
+
+pkmn_colores_tipo2 <- crossing(
+  color_1 = pkmn_colores_tipo$color,
+  color_2 = pkmn_colores_tipo$color
+  ) %>% 
+  mutate(
+    color_f = purrr::map2_chr(
+      color_1,
+      color_2,
+      ~ colorRampPalette(c(.x, .y))(100)[round(100 * .25)])
+    )
+
+
+
+pkmn <- pkmnes %>% 
+  left_join(pkmn_tipo, by = c("id" = "pokemon_id")) %>% 
+  left_join(pkmn_colores_tipo %>% rename(type_1 = type, color_1 = color), by = "type_1") %>% 
+  left_join(pkmn_colores_tipo %>% rename(type_2 = type, color_2 = color), by = "type_2") %>% 
+  left_join(pkmn_colores_tipo2, by =  c("color_1", "color_2")) %>% 
+  mutate(color_f = ifelse(is.na(color_f), color_1, color_f))
+
+dprinc <- pkmn %>% 
+  select(name = type_1, color = color_1) %>% 
+  distinct() %>% 
+  mutate(id = str_to_id(name))
+
+dsecun <- pkmn %>% 
+  count(type_1, type_2, color_f) %>% 
+  # los siguiente nombre de columnas son para que highcharts los use 
+  # internamente.
+  transmute(
+    name =  ifelse(is.na(type_2), paste("only", type_1), type_2),
+    parent = str_to_id(type_1),
+    color = color_f,
+    value = n
+    ) %>% 
+  mutate(id = as.character(row_number()))
+
+dd <- list(dprinc, dsecun) %>%
+  purrr::map(mutate_if, is.factor, as.character) %>% 
+  bind_rows() %>% 
+  list_parse() %>% 
+  purrr::map(function(x) x[!is.na(x)])
+
+
+highchart() %>% 
+  hc_chart(type = "treemap") %>% 
+  hc_title(
+    text = "Pokemon por tipos"
+  ) %>% 
+  hc_add_series(
+    data = dsecun,
+    allowDrillToNode = TRUE,
+    levelIsConstant = FALSE,
+    textOverflow = "clip",
+    dataLabels = list(color = "white"),
+    levels = list(
+      list(
+        level = 1,
+        borderWidth = 1,
+        dataLabels = list(
+          enabled = TRUE,
+          verticalAlign = "top",
+          align = "left",
+          style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        )
+      )
+    ) %>% 
+  # esto es para que el primer nivel, que no tiene color asigando, 
+  # sea transparente.
+  hc_colors("trasnparent")
+
+```
+
+
+```{r}
+    n <- 1000
+    BD <- tibble(
+    id = 1:n,
+    tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
+    candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T),
+    percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+    mencionGenerada = sample(c("Boletines\n de prensa", "declaraciones", "filtraciones"), n, replace = T),
+    mencionNoGenerada = sample(c("personaje", "columnista", "adversario", "partidario"), n, replace = T),
+    calif_generada = sample(c("Mala", "Buena", "Regular"), n, replace = T),
+    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T), 
+    entidad = sample(c("Michoacán", "Nuevo León"), 
+                     n, replace = T, 
+                     prob = c(.5, .5))
+    )
+
+BD <- filter(BD, entidad=="Michoacán")
+
+treemap_calificacion <- function(BD, candida){    
+base1 <- BD %>% 
+    filter(candidato %in% candida)%>% 
+         select(mencionGenerada) %>% 
+         unique() %>% 
+         mutate(color=if_else(mencionGenerada=="Boletines\n de prensa", "#FFFFFF", 
+                    if_else(mencionGenerada=="declaraciones","#FFFFFF","#FFFFFF")),
+                id = str_to_id(mencionGenerada)
+                )%>%
+         rename("name"="mencionGenerada")
+base2 <- BD %>% 
+    filter(candidato %in% candida)%>% 
+         count(percepcion, mencionGenerada) %>% 
+         mutate(color=if_else(percepcion=="Buena",
+                              "#0f4c42",                     
+                      if_else(percepcion=="Mala",
+                            "#cb2833","#808080")),
+                parent=str_to_id(mencionGenerada),
+                id = as.character(row_number())) %>% 
+        rename("name"= "percepcion", "value"="n")
+dde <- list(base1, base2) %>%
+  purrr::map(mutate_if, is.factor, as.character) %>% 
+  bind_rows() %>% 
+  list_parse() %>% 
+  purrr::map(function(x) x[!is.na(x)])
+
+gra <- highchart() %>% 
+  hc_chart(type = "treemap") %>% 
+  hc_title(
+    text = paste0("Calificación de menciones ", candida)
+  ) %>% 
+  hc_add_series(
+    data = dde,
+    allowDrillToNode = TRUE,
+    levelIsConstant = TRUE,
+    textOverflow = "clip",
+    dataLabels = list(color = "white"),
+    levels = list(
+      list(
+        level = 1,
+        borderWidth = 8,
+        dataLabels = list(
+          enabled = TRUE,
+          verticalAlign = "top",
+          align = "left",
+          style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        ),
+      list(
+        level = 2,
+        borderWidth = 0,
+        dataLabels = list(enabled = FALSE)
+        )
+      )
+    ) %>% 
+  # esto es para que el primer nivel, que no tiene color asigando, 
+  # sea transparente.
+  hc_colors("trasnparent")
+
+
+  return(gra)
+}
+
+treemap_calificacion(BD, candida="candidato 3")
+```
+```{r}
+treemap_calificacion_bis <- function(BD, candida){
+base1 <- BD %>% 
+    filter(candidato %in% candida)%>%
+         select(percepcion) %>% 
+         unique() %>% 
+        mutate(color=if_else(percepcion=="Buena",
+                              "#FFFFFF",                     
+                      if_else(percepcion=="Mala",
+                            "#FFFFFF","#FFFFFF")),
+                id=str_to_id(percepcion)) %>% 
+         rename("name"="percepcion")
+base2 <- BD %>% 
+    filter(candidato %in% candida)%>%
+         count(percepcion, mencionGenerada) %>% 
+         mutate(color=if_else(percepcion=="Buena" & 
+                                mencionGenerada=="Boletines\n de prensa",
+                              "#006d2c",
+                      if_else(percepcion=="Buena" & 
+                                mencionGenerada=="declaraciones",
+                              "#31a354",
+                      if_else(percepcion=="Buena" & 
+                               mencionGenerada=="filtraciones",
+                               "#74c476",
+                      if_else(percepcion=="Mala" & 
+                                mencionGenerada=="Boletines\n de prensa",
+                               "#a50f15",
+                       if_else(percepcion=="Mala" & 
+                                mencionGenerada=="declaraciones",
+                               "#de2d26",
+                       if_else(percepcion=="Mala" & 
+                                mencionGenerada=="filtraciones",
+                               "#fb6a4a", 
+                      if_else(percepcion=="Regular" & 
+                                mencionGenerada=="Boletines\n de prensa",
+                               "#636363",
+                       if_else(percepcion=="Regular" & 
+                                mencionGenerada=="declaraciones",
+                               "#969696","#cccccc")))))))),
+                parent=str_to_id(percepcion),
+                id = as.character(row_number())) %>% 
+        rename("name"= "mencionGenerada", "value"="n")
+dde <- list(base1, base2) %>%
+  purrr::map(mutate_if, is.factor, as.character) %>% 
+  bind_rows() %>% 
+  list_parse() %>% 
+  purrr::map(function(x) x[!is.na(x)])
+
+gra <-  highchart() %>% 
+  hc_chart(type = "treemap") %>% 
+  hc_title(
+    text = paste0("Calificación de menciones ", candida)
+  ) %>%
+  hc_add_series(
+    data = dde,
+    allowDrillToNode = TRUE,
+    levelIsConstant = TRUE,
+    textOverflow = "clip",
+    dataLabels = list(color = "white"),
+    levels = list(
+      list(
+        level = 1,
+        borderWidth = 8,
+        dataLabels = list(
+          enabled = TRUE,
+          verticalAlign = "top",
+          align = "left",
+          style = list(fontSize = "12px", textOutline = FALSE)
+          )
+        ),
+      list(
+        level = 2,
+        borderWidth = 0,
+        dataLabels = list(enabled = FALSE)
+        )
+      )
+    ) %>% 
+  # esto es para que el primer nivel, que no tiene color asigando, 
+  # sea transparente.
+  hc_colors("trasnparent")
+
+
+  return(gra)
+}
+
+treemap_calificacion_bis(BD, candida="candidato 3")
+
+
+```

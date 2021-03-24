@@ -14,7 +14,7 @@ app_ui <- function(request) {
                                tags$li(class = "dropdown",
                                        tags$li(class = "dropdown",
                                                div(
-                                                 selectInput("entidad",label = NULL,choices = c("Michoacán","Nuevo León"))   
+                                                 selectInput("entidad",label = NULL,choices = NULL, selected = NULL)   
                                                )
                                        )
                                ),
@@ -43,7 +43,7 @@ app_ui <- function(request) {
                   mod_redes_general_ui("redes_general_ui_1")
                   ),
           tabItem(tabName = "noticias",
-                  mod_noticias_ui("noticias_ui_1")
+                  mod_noticias_general_ui("noticias_general_ui_1")
           ),
           tabItem(tabName = "a_electoral",
                   mod_a_electoral_ui("a_electoral_ui_1")

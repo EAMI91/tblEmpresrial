@@ -7,21 +7,150 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
+#' @import highcharter dplyr tibble quanteda plotly tidyr ggfittext ggthemes
+
 mod_noticias_ui <- function(id){
   ns <- NS(id)
   tagList(
- 
+    fluidRow(
+      column(width = 12, class="shadowBox",
+        shinycssloaders::withSpinner(highchartOutput(ns("timeNoticias")))
+            ),
+      column(width =  6, class="shadowBox",
+             shinycssloaders::withSpinner(plotOutput(ns("nubePalabras")))
+        ),
+      column(width =  6, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("termometro")))
+        ),
+      column(width = 12, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("temasEleccion")))
+      ),
+      
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada1")))
+      ),
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada2")))
+      ), 
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada3")))
+      ),
+      column(width = 6, class="shadowBox",
+             shinycssloaders::withSpinner(highchartOutput(ns("califGenerada4")))
+      )
+    )
   )
 }
     
 #' noticias Server Function
 #'
 #' @noRd 
-mod_noticias_server <- function(input, output, session){
+mod_noticias_server <- function(input, output, session, df2){
   ns <- session$ns
- 
-}
+  
+  bd <- reactive({
+    n <- 1000
+    v <- rep("Este es un texto a ser noticia", n)
+    x <- c("12/01/2020", "13/01/2020","14/01/2020", "15/01/2020", "16/01/2020", "17/01/2020",
+           "12/02/2020", "13/02/2020","14/02/2020", "15/02/2020", "16/02/2020", "17/02/2020",
+           "12/01/2021", "13/01/2021","14/01/2021", "15/01/2021", "16/01/2021", "17/01/2021",
+           "12/02/2021", "13/02/2021","14/02/2021", "15/02/2021", "16/02/2021", "17/02/2021")
+    X <- sample(c("Buena", "Mala", "Regular"), n, replace=T) 
+    filePath <- "http://www.sthda.com/sthda/RDoc/example-files/martin-luther-king-i-have-a-dream-speech.txt"
+    text <- readLines(filePath) 
+    remove <- c("", " ")
+    text <- setdiff(text, remove)
     
+    BD <- tibble(
+    id = 1:n, title = v, calificacion = X,
+    fecha = as.Date(rep(x, len = n)),
+    text = rep(text, len = n),               
+    temas = sample(c("Deportes", "Cultura", "Sociedad", "Tecnología", "Otros"), n, replace=T),
+    entidad = sample(c("Michoacán", "Nuevo León"), 
+                     n, replace = T, 
+                     prob = c(.5, .5))
+    ) %>% 
+    mutate(temasOtro = case_when(temas == "Otros" ~ "Otro tema"), Noticias = 1)
+    BD <- filter(BD, entidad==!!entidad())
+  })
+  
+  bd_2 <- reactive({
+    n <- 1000
+    BD <- tibble(
+    id = 1:n,
+    tipoEvento = sample(c("Político", "Electoral", "Acto de\nCampaña"), n, replace = T),
+    candidato = sample(c("candidato 1", "candidato 2", "candidato 3", "candidato 4"), n, replace = T),
+    percepcion = sample(c("Buena", "Mala", "Regular"), n, replace = T),
+    mencionGenerada = sample(c("Boletines\n de prensa", "declaraciones", "filtraciones"), n, replace = T),
+    mencionNoGenerada = sample(c("personaje", "columnista", "adversario", "partidario"), n, replace = T),
+    calif_generada = sample(c("Mala", "Buena", "Regular"), n, replace = T),
+    calif_no_generada = sample(c("Buena", "Mala", "Regular"), n, replace = T), 
+    entidad = sample(c("Michoacán", "Nuevo León"), 
+                     n, replace = T, 
+                     prob = c(.5, .5))
+    )
+    BD <- filter(BD, entidad==!!entidad())
+    })
+  
+  nivel <- reactive({
+    base_termo <- tibble(
+      entidad = sample(c("Michoacán", "Nuevo León"), 2, replace = F),
+      num=sample(1:100, 2))
+    base_termo <- filter(base_termo, entidad==!!entidad())
+    base_termo$num
+    })
+  
+  output$timeNoticias <- renderHighchart({
+    paleta <- c("Negativa"="#710627", "Neutral"="#CF8C40", "Positiva"="#BBC200")
+    noticias <- df2$noticias %>% 
+      
+      mutate(fecha=floor_date(fecha,unit = "day"), 
+             fecha=as.Date(fecha)) %>% 
+      filter(!is.na(calificacion)) %>% 
+      count(fecha, calificacion)
+    
+    timeline_noticias(noticias)
+  })
+  
+  output$nubePalabras <- renderPlot({
+    noticias_nube <- df2$noticias %>% 
+      filter(!is.na(calificacion))
+    Nube <- procesando_nube_not(noticias_nube)
+    graficando_nube_not(Nube, 5)
+  })
+  
+  output$termometro <- renderHighchart({
+    paratermo <- df2$noticias %>% 
+             mutate(nivel=nrow(.)*20)
+    paratermo <- paratermo$nivel
+    termo(paratermo)
+  })
+ 
+  output$temasEleccion <- renderHighchart({
+    temas_eleccion(bd(),
+                   pregunta = temas,
+                   otro = temasOtro,
+                   x = 0,
+                   titulo = "Temas de la elección general")
+  })
+  
+
+  output$califGenerada1 <- renderHighchart({
+    treemap_calificacion_bis(bd_2(), candida="candidato 1")
+  })
+  
+  output$califGenerada2 <- renderHighchart({
+    treemap_calificacion_bis(bd_2(), candida="candidato 2")
+  })
+  output$califGenerada3 <- renderHighchart({
+    treemap_calificacion_bis(bd_2(), candida="candidato 3")
+  })
+  
+  output$califGenerada4 <- renderHighchart({
+    treemap_calificacion_bis(bd_2(), candida="candidato 4")
+  })
+}
+ 
 ## To be copied in the UI
 # mod_noticias_ui("noticias_ui_1")
     

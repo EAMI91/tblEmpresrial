@@ -23,11 +23,16 @@ usethis::use_package("ggplot2")
 usethis::use_package("tibble")
 usethis::use_package("magrittr")
 usethis::use_package("lubridate")
-usethis::use_package("quanteda")
 usethis::use_package("rtweet")
 usethis::use_package("quanteda.textplots")
 usethis::use_package("here")
+usethis::use_package("quanteda")
+usethis::use_package("plotly")
+usethis::use_package("tidyr")
+usethis::use_package("ggfittext")
+usethis::use_package("ggthemes")
 usethis::use_package("purrr")
+usethis::use_package("pool")
 
 
 ## Add modules ----
@@ -36,12 +41,15 @@ golem::add_module( name = "encuestas",fct = "graficas" ) # Name of the module
 golem::add_module( name = "redes_sociales", fct = "graficas" ) # Name of the module
 golem::add_module( name = "noticias", fct = "graficas" )
 golem::add_module( name = "a_electoral", fct = "graficas" )
+golem::add_module( name = "noticias_barras", fct = "graficas" )
+golem::add_module( name = "noticias_general")
 golem::add_module( name = "red_profundo", fct = "graficas" )
 golem::add_module( name = "redes_general")
 
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" ) 
+golem::add_fct("pool") 
 golem::add_utils( "helpers" )
 
 ## External resources
@@ -62,6 +70,7 @@ usethis::use_test( "app" )
 
 ## Vignette ----
 usethis::use_vignette("redes_sociales")
+usethis::use_vignette("noticias")
 devtools::build_vignettes()
 
 ## Code coverage ----
