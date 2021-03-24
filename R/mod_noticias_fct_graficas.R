@@ -44,7 +44,7 @@ procesando_nube_not <- function(bd){
   titulo <- "Temas electoraes"
   #corp_tm <- tm::VCorpus(tm::VectorSource(words))
   corp_quanteda <- corpus(words,text_field = "texto")
-  Nube <- dfm(corp_quanteda, remove = stopwords("english"),
+  Nube <- dfm(corp_quanteda, remove = stopwords("spanish"),
               remove_punct = TRUE, groups = "calificacion")
   return(Nube)
 }
@@ -55,7 +55,7 @@ graficando_nube_not <- function(db, z){
                              labelsize= 1.5,
                              labelcolor =  "#161F29",
                              labeloffset = .001,
-                             color = c("#0f4c42", "#cb2833", "#91d400", "#174a80", "#ffc200"))+ theme_minimal()+
+                             color = c( "#cb2833","#808080","#0f4c42"))+ theme_minimal()+
     theme(text=element_text(size=16,   family="Avenir Next"),
           panel.border = element_blank())
   

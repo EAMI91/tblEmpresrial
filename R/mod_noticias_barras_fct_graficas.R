@@ -20,8 +20,7 @@ barras_candidatos <- function(bd,  col, title){
   hc_title(text = as.character(title)) %>% 
   hc_xAxis(title = " ") %>% 
   hc_yAxis(title = " ") %>%   
-  # hc_colors(c("#cb2833", "#174a80", "#00A896",
-  #             "#0f4c42"))%>%
+  hc_colors(colors = unique(barra$color[order(barra$Candidato)])) %>% 
   hc_chart(style = list(fontFamily = "Avenir next"
   ))
 return(graph)
