@@ -6,14 +6,9 @@ barras_candidatos <- function(bd,  col, title){
   bd <- bd %>%
     filter(!is.na(Candidato)) %>% 
     mutate(n  =  1) %>%
-    group_by(!!sym(col), Candidato, color) %>%
-    summarise(across(n, sum)) %>% 
-   ungroup() %>%
-  mutate(totales=sum(n),
-         percentage=round((n/totales)*100,2)) %>%
-  mutate(label = paste(round(percentage, 1), "%", sep = " "))
+    count(!!sym(col), Candidato, color)  
   
-  graph <- hchart(bd, hcaes(x = !!sym(col), y = percentage, 
+  graph <- hchart(bd, hcaes(x = !!sym(col), y = n, 
                             group = Candidato, color=color), 
          type = "bar") %>%
   hc_add_theme(hc_theme_google()) %>% 

@@ -81,7 +81,7 @@ mod_noticias_barras_server <- function(input, output, session, df2){
         mutate(color=if_else(Partido=="MORENA", "#BF3722", 
                      if_else(Partido=="INDEPENDIENTE", "#9E7BB5",
                      if_else(Partido=="PAN", "#2260BF",
-                     if_else(Partido=="PRI", "#23A95D","#E6BD19")))))
+                     if_else(Partido=="PVEM", "#23A95D","#E6BD19")))))
       
       )})
 

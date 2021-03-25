@@ -81,7 +81,7 @@ mod_noticias_server <- function(input, output, session, df2){
     noticias_nube <- df2$noticias %>% 
       filter(!is.na(calificacion))
     Nube <- procesando_nube_not(noticias_nube)
-    graficando_nube_not(Nube, 5)
+    graficando_nube_not(Nube)
   })
   
   output$termometro <- renderHighchart({

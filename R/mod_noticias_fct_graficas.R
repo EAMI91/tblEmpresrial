@@ -49,8 +49,8 @@ procesando_nube_not <- function(bd){
   return(Nube)
 }
 
-graficando_nube_not <- function(db, z){
-  nube <- textplot_wordcloud(db, min_count = z,comparison = TRUE, max_words = 300, adjust = 0, rotation   = 0.1, random_order = FALSE,random_color = FALSE, ordered_color = FALSE,
+graficando_nube_not <- function(db){
+  nube <- textplot_wordcloud(db, comparison = TRUE, max_words = 300, adjust = 0, rotation   = 0.1, random_order = FALSE,random_color = FALSE, ordered_color = FALSE,
                              # font = "Avenir Next",
                              labelsize= 1.5,
                              labelcolor =  "#161F29",
