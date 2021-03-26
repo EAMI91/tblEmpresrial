@@ -46,8 +46,8 @@ reach <- function(bd){
 
 
 graficando_saldo <- function(df){
-  hchart(df, hcaes(x = fecha,y = n, group = calificacion), type = "column", stacking = "normal") %>%
-    hc_colors(colors = c("#f03b20",  "grey", "#31a354")) %>%
+  hchart(df, hcaes(x = fecha,y = n, group = calificacion, color=color), type = "column", stacking = "normal") %>%
+    hc_colors(colors = unique(df$color[order(df$calificacion)])) %>%
     hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }"))) %>%
     hc_xAxis(crosshair = T, title = list(text = F), type = "datetime",
              lineWidth = 0, tickWidth  = 0, gridLineWidth =0,

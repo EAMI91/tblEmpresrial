@@ -90,8 +90,9 @@ mod_redes_sociales_server <- function(input, output, session, df2, candidatos){
        mutate(fecha=floor_date(TW_CreatedAt,unit="day"), 
               fecha=as.Date(fecha)) %>% 
        count(fecha, calificacion) %>% 
-       filter(!is.na(calificacion))
-    
+       filter(!is.na(calificacion)) %>% 
+       mutate(color=if_else(calificacion=="Negativo", "#f03b20", 
+                            if_else(calificacion=="Positivo", "#31a354", "#F0F0F0"))) 
     graficando_saldo(en)
      })
   

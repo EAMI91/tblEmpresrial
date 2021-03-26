@@ -270,23 +270,25 @@ en <- entrenamiento %>%
   mutate(fecha=floor_date(TW_CreatedAt,unit="day"), 
          fecha=as.Date(fecha)) %>% 
    count(fecha, calificacion) %>% 
-        filter(!is.na(calificacion)) 
+        filter(!is.na(calificacion)) %>% 
+   mutate(color=if_else(calificacion=="Negativo", "#f03b20", 
+                if_else(calificacion=="Positivo", "#31a354", "#F0F0F0"))) 
   # mutate(fecha=datetime_to_timestamp(fecha))
 
 
 
 
-secu <- tibble(fecha=seq(min(en$fecha), today(), by = "days"), 
-               calificacion=sample(c("Positivo", "Negativo", "Neutral"),  size = as.numeric(today()-min(en$fecha))+1, 
-                                   replace = T)) %>% 
-        tidyr::expand(fecha, calificacion) %>% 
-       left_join(en)
+# secu <- tibble(fecha=seq(min(en$fecha), today(), by = "days"), 
+#                calificacion=sample(c("Positivo", "Negativo", "Neutral"),  size = as.numeric(today()-min(en$fecha))+1, 
+#                                    replace = T)) %>% 
+#         tidyr::expand(fecha, calificacion) %>% 
+#        left_join(en)
+# 
+# secu$n[is.na(secu$n)] <-0
 
-secu$n[is.na(secu$n)] <-0
 
-
-hchart(en, hcaes(x = fecha,y = n, group = calificacion), type = "column", stacking = "normal") %>%
-    hc_colors(colors = c("#f03b20",  "grey", "#31a354")) %>%
+hchart(en, hcaes(x = fecha,y = n, group = calificacion, color=color), type = "column", stacking = "normal") %>%
+    hc_colors(colors = unique(en$color[order(en$calificacion)])) %>%
     hc_yAxis(labels= list(formatter = JS("function(){ return Math.abs(this.value); }"))) %>%
     hc_xAxis(crosshair = T, title = list(text = F), type = "datetime",
              lineWidth = 0, tickWidth  = 0, gridLineWidth =0,
