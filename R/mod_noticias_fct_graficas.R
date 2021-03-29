@@ -1,19 +1,19 @@
 timeline_noticias <- function(bd){
   # Funciones para volver al español
-  hcoptslang <- getOption("highcharter.lang")
-  hcoptslang$weekdays<- c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
-  hcoptslang$shortMonths <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
-  hcoptslang$months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
-  hcoptslang$thousandsSep <- c(",")
-  options(highcharter.lang = hcoptslang)
+  # hcoptslang <- getOption("highcharter.lang")
+  # hcoptslang$weekdays<- c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
+  # hcoptslang$shortMonths <- c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
+  # hcoptslang$months <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+  # hcoptslang$thousandsSep <- c(",")
+  # options(highcharter.lang = hcoptslang)
   
   
   hc <- bd %>% 
-    hchart( hcaes(x = fecha, y = Noticias, group = calificacion), type="line"
+    hchart( hcaes(x = fecha, y = n, group = calificacion), type="line"
     )  %>%
     hc_colors(c("#BBC200", "#710627", "#CF8C40")) %>% 
     hc_plotOptions(line= list(lineWidth = 4,
-                              marker = list(radius =0),
+                              marker = list(radius =5),
                               stickyTracking=F)) %>% 
     hc_xAxis(crosshair = T, title = list(text = "Fecha"), type = "datetime",
              lineWidth = 0, tickWidth  = 0, gridLineWidth =0, 
@@ -38,23 +38,24 @@ timeline_noticias <- function(bd){
   return(hc)
 }
 
-procesando_nube_not <- function(bd, z){
-  words <- select(bd, text, calificacion) %>% na.omit() 
+procesando_nube_not <- function(bd){
+  
+  words <- select(bd, texto, calificacion) 
   titulo <- "Temas electoraes"
-  corp_quanteda <- corpus(words)
-  Nube <- dfm(corp_quanteda, remove = stopwords("english"),
-              remove_punct = TRUE, groups = "calificacion")%>%
-    dfm_trim(min_termfreq = z)
+  #corp_tm <- tm::VCorpus(tm::VectorSource(words))
+  corp_quanteda <- corpus(words,text_field = "texto")
+  Nube <- dfm(corp_quanteda, remove = stopwords("spanish"),
+              remove_punct = TRUE, groups = "calificacion")
   return(Nube)
 }
 
-graficando_nube_not <- function(db, z){
-  nube <- textplot_wordcloud(db, min_count = z,comparison = TRUE, max_words = 300, adjust = 0, rotation   = 0.1, random_order = FALSE,random_color = FALSE, ordered_color = FALSE,
+graficando_nube_not <- function(db){
+  nube <- textplot_wordcloud(db, comparison = TRUE, max_words = 300, adjust = 0, rotation   = 0.1, random_order = FALSE,random_color = FALSE, ordered_color = FALSE,
                              # font = "Avenir Next",
                              labelsize= 1.5,
                              labelcolor =  "#161F29",
                              labeloffset = .001,
-                             color = c("#0f4c42", "#cb2833", "#91d400", "#174a80", "#ffc200"))+ theme_minimal()+
+                             color = c( "#cb2833","#808080","#0f4c42"))+ theme_minimal()+
     theme(text=element_text(size=16,   family="Avenir Next"),
           panel.border = element_blank())
   
@@ -365,58 +366,64 @@ treemap_calificacion <- function(BD, candida){
   return(gra)
 }
 
-treemap_calificacion_bis <- function(BD, candida){
+treemap_calificacion_bis <- function(BD){
+  
+  
+  
   base1 <- BD %>% 
-    filter(candidato %in% candida)%>%
-    select(percepcion) %>% 
+    # filter(candidato %in% candida)%>%
+    select(calificacion) %>% 
+    filter(!is.na(calificacion)) %>% 
     unique() %>% 
-    mutate(color=if_else(percepcion=="Buena",
+    mutate(color=if_else(calificacion=="Positiva",
                          "#FFFFFF",                     
-                         if_else(percepcion=="Mala",
+                         if_else(calificacion=="Negativa",
                                  "#FFFFFF","#FFFFFF")),
-           id=str_to_id(percepcion)) %>% 
-    rename("name"="percepcion")
+           id=str_to_id(calificacion)) %>% 
+    rename("name"="calificacion")
   base2 <- BD %>% 
-    filter(candidato %in% candida)%>%
-    count(percepcion, mencionGenerada) %>% 
-    mutate(color=if_else(percepcion=="Buena" & 
-                  mencionGenerada=="Boletines\n de prensa","#006d2c",
-                  if_else(percepcion=="Buena" & 
-                  mencionGenerada=="declaraciones",
-                  "#31a354",
-                  if_else(percepcion=="Buena" & 
-                  mencionGenerada=="filtraciones",
-                  "#74c476",
-                  if_else(percepcion=="Mala" & 
-                  mencionGenerada=="Boletines\n de prensa",
-                  "#a50f15",
-                  if_else(percepcion=="Mala" & 
-                  mencionGenerada=="declaraciones",
-                  "#de2d26",
-                  if_else(percepcion=="Mala" & 
-                  mencionGenerada=="filtraciones",
-                  "#fb6a4a", 
-                  if_else(percepcion=="Regular" & 
-                  mencionGenerada=="Boletines\n de prensa",
-                  "#636363",
-                  if_else(percepcion=="Regular" & 
-                  mencionGenerada=="declaraciones",
-                  "#969696","#cccccc")))))))),
-           parent=str_to_id(percepcion),
+    # filter(candidato %in% candida)%>%
+    count(calificacion, tipoFuente) %>% 
+    filter(!is.na(calificacion)) %>%  
+    
+    mutate(color=if_else(calificacion=="Positiva" & 
+                 tipoFuente=="Boletín de prensa",
+                 "#006d2c",
+                 if_else(calificacion=="Positiva" & 
+                 tipoFuente=="Declaraciones",
+                 "#31a354",
+                 if_else(calificacion=="Positiva" & 
+                 tipoFuente=="Filtraciones",
+                 "#74c476",
+                 if_else(calificacion=="Negativa" & 
+                 tipoFuente=="Boletín de prensa",
+                 "#a50f15",
+                 if_else(calificacion=="Negativa" & 
+                 tipoFuente=="Declaraciones",
+                 "#de2d26",
+                 if_else(calificacion=="Negativa" & 
+                 tipoFuente=="Filtraciones",
+                 "#fb6a4a", 
+                 if_else(calificacion=="Neutra" & 
+                 tipoFuente=="Boletín de prensa",
+                 "#feb24c",
+                 if_else(calificacion=="Neutra" & 
+                 tipoFuente=="Declaraciones",
+                 "#fed976","#ffffb2")))))))),
+           parent=str_to_id(calificacion),
            id = as.character(row_number())) %>% 
-    rename("name"= "mencionGenerada", "value"="n")
+    rename("name"= "tipoFuente", "value"="n")
   dde <- list(base1, base2) %>%
     purrr::map(mutate_if, is.factor, as.character) %>% 
     bind_rows() %>% 
     list_parse() %>% 
     purrr::map(function(x) x[!is.na(x)])
   
-  grafi <-  highchart() %>% 
+  gra <-  highchart() %>% 
     hc_chart(type = "treemap") %>% 
     hc_title(
-      text = paste0("Calificación de menciones ", candida)
+      text = "Calificación de menciones de la elección"
     ) %>%
-    hc_add_theme(hc_theme_google()) %>% 
     hc_add_series(
       data = dde,
       allowDrillToNode = TRUE,
@@ -437,22 +444,16 @@ treemap_calificacion_bis <- function(BD, candida){
         list(
           level = 2,
           borderWidth = 0,
-          dataLabels = list(
-            enabled = TRUE, 
-            verticalAlign = "bottom",
-            align = "left",
-            style = list(fontSize = "12px", textOutline = FALSE)
-            
-          )
+          dataLabels = list(enabled = FALSE)
         )
-        )
+      )
     ) %>% 
     # esto es para que el primer nivel, que no tiene color asigando, 
     # sea transparente.
-    hc_colors("trasnparent") %>% 
-    hc_chart(style = list(fontFamily = "Avenir next"
-    ))
+    hc_colors("trasnparent")
   
   
-  return(grafi)
+  return(gra)
 }
+
+
