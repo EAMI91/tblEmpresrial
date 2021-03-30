@@ -34,7 +34,7 @@ Imports:
     shinycssloaders,
     rtweet,
     purrr,
-    shinymanager
+    shinymanager,
     pool
 Encoding: UTF-8
 LazyData: true
