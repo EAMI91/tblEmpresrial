@@ -39,6 +39,7 @@ usethis::use_package("quanteda.textplots")
 usethis::use_package("here")
 usethis::use_package("shinymanager")
 usethis::use_package("pool")
+usethis::use_package("dbplyr")
 
 
 ## Add modules ----

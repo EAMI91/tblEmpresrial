@@ -86,6 +86,13 @@
       "Repository": "CRAN",
       "Hash": "e031418365a7f7a766181ab5a41a5716"
     },
+    "RMariaDB": {
+      "Package": "RMariaDB",
+      "Version": "1.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "81e196623ac37ccb8c3c61bf0093f205"
+    },
     "RSQLite": {
       "Package": "RSQLite",
       "Version": "2.2.3",
@@ -337,6 +344,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "d1b8b1a821ee564a3515fa6c6d5c52dc"
+    },
+    "dbplyr": {
+      "Package": "dbplyr",
+      "Version": "2.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f30247ffeeebe8d9842dc68fe63e043b"
     },
     "desc": {
       "Package": "desc",
@@ -798,6 +812,13 @@
       "Repository": "CRAN",
       "Hash": "f6b85d9e4ed88074ea0ede1aa74bb00e"
     },
+    "pool": {
+      "Package": "pool",
+      "Version": "0.1.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "adbd1934555da2c62338acd48ad957f5"
+    },
     "praise": {
       "Package": "praise",
       "Version": "1.0.0",
@@ -1097,8 +1118,8 @@
       "RemoteUsername": "EAMI91",
       "RemoteRepo": "shinymanager",
       "RemoteRef": "spanish",
-      "RemoteSha": "e68b62f1eec7b283ed8803366e1f97f45b7f669f",
-      "Hash": "5321d97e0d28f043c4937f847d7aca9e"
+      "RemoteSha": "d82efa3e98ba3ae8878518aaaa3c1cc0a2d118dd",
+      "Hash": "6bb117899e2ac5b672a768b0c94840a7"
     },
     "slickR": {
       "Package": "slickR",

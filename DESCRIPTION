@@ -35,7 +35,8 @@ Imports:
     rtweet,
     purrr,
     shinymanager,
-    pool
+    pool,
+    dbplyr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
