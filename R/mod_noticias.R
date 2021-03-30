@@ -45,7 +45,7 @@ mod_noticias_ui <- function(id){
 #' noticias Server Function
 #'
 #' @noRd 
-mod_noticias_server <- function(input, output, session, entidad){
+mod_noticias_server <- function(input, output, session, df2){
   ns <- session$ns
   
   bd <- reactive({
@@ -101,20 +101,29 @@ mod_noticias_server <- function(input, output, session, entidad){
     })
   
   output$timeNoticias <- renderHighchart({
-    E <- bd() %>% 
-      group_by(calificacion, fecha) %>% 
-      summarise(across(Noticias, sum))
+    paleta <- c("Negativa"="#710627", "Neutral"="#CF8C40", "Positiva"="#BBC200")
+    noticias <- df2$noticias %>% 
+      
+      mutate(fecha=floor_date(fecha,unit = "day"), 
+             fecha=as.Date(fecha)) %>% 
+      filter(!is.na(calificacion)) %>% 
+      count(fecha, calificacion)
     
-    timeline_noticias(E)
+    timeline_noticias(noticias)
   })
   
   output$nubePalabras <- renderPlot({
-    Nube <- procesando_nube_not(bd(), 10)
-    graficando_nube_not(Nube, 10)
+    noticias_nube <- df2$noticias %>% 
+      filter(!is.na(calificacion))
+    Nube <- procesando_nube_not(noticias_nube)
+    graficando_nube_not(Nube, 5)
   })
   
   output$termometro <- renderHighchart({
-    termo(nivel())
+    paratermo <- df2$noticias %>% 
+             mutate(nivel=nrow(.)*20)
+    paratermo <- paratermo$nivel
+    termo(paratermo)
   })
  
   output$temasEleccion <- renderHighchart({
