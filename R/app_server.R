@@ -2,7 +2,7 @@
 #' 
 #' @param input,output,session Internal parameters for {shiny}. 
 #'     DO NOT REMOVE.
-#' @import shiny purrr slickR rtweet
+#' @import shiny purrr slickR rtweet RMariaDB
 #' @noRd
 app_server <- function( input, output, session ) {
   # List the first level callModules here

@@ -40,6 +40,7 @@ usethis::use_package("here")
 usethis::use_package("shinymanager")
 usethis::use_package("pool")
 usethis::use_package("dbplyr")
+usethis::use_package("RMariaDB")
 
 
 ## Add modules ----
