@@ -98,7 +98,7 @@ graficando_nube <- function(DB){
                    rotation   = 0, random_order = FALSE,
                    random_color = FALSE,fixed_aspect=TRUE,
                    ordered_color = FALSE,
-                   color = c("#f03b20", "#31a354")) + theme_minimal()
+                   color = c("#f03b20","#d8d8d8", "#31a354")) + theme_minimal()
   return(nube)
 }
 
